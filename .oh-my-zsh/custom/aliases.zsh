@@ -8,7 +8,7 @@ alias ciao-mondo="echo hello-world"
 # functions #
 #############
 
-# initialize a github repo with a custom name (if specified)
+# initialize a github repo with a custom name
 function repo-hub() {
 		# generating files
 		mkdir $1 && cd $1
@@ -22,7 +22,7 @@ function repo-hub() {
 		git push --set-upstream origin master
 }
 
-# initialize a git repo with a custom name (if specified)
+# initialize a git repo with a custom name
 function repo-local() {
 		# generating files
 		mkdir $1 && cd $1
@@ -44,7 +44,8 @@ function laravel-mix-init() {
 		node_modules/.bin/webpack --config=node_modules/laravel-mix/setup/webpack.config.js
 
 		# add custom scripts to package.json
-		cat ~/.copy/package.json.copy | pbcopy
+		cat ~/.copy/laravel-mix-init/package.json.copy | pbcopy # macos
+		xclip -selection clipboard ~/.copy/laravel-mix-init/package.json.copy # linux
 		vim package.json
 
 		# for handling different environments
@@ -55,6 +56,15 @@ function laravel-mix-init() {
 
 		# add custom .gitignore
 		touch .gitignore
-		cat ~/.copy/.gitignore.copy | pbcopy
+		cat ~/.copy/laravel-mix-init/.gitignore.copy | pbcopy # macos
+		xclip -selection clipboard ~/.copy/laravel-mix-init/.gitignore.copy # linux
 		vim .gitignore
+}
+
+# auto ssh login (linux)
+function ssh-login() {
+		eval "$(ssh-agent -s)"
+		xclip -selection clipboard ~/.copy/ssh-login/passphrase.txt.copy
+		ssh-add ~/.ssh/id_rsa
+		xclip -selection clipboard ~/.copy/ssh-login/clear.txt.copy
 }
