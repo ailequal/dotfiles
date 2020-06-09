@@ -1,5 +1,10 @@
-# bash_aliases #
-################
+#################
+# .bash_profile #
+#################
+
+
+# aliases #
+###########
 
 # ciao-mondo
 alias ciao-mondo="echo hello-world"
