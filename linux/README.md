@@ -67,7 +67,8 @@ Set up your multiple ssh keys correctly and test them.
 ### extra packages
 
 These extra packages must be installed manually.
-
+* [GitHub Desktop](https://github.com/shiftkey/desktop)
+* [Typora](https://typora.io)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)

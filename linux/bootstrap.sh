@@ -13,6 +13,7 @@ sudo apt -y update && sudo apt -y upgrade
 sudo snap install code --classic
 sudo snap install chromium
 sudo snap install postman
+sudo snap install telegram-desktop
 
 # apt packages
 sudo apt -y install \
