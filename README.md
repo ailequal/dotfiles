@@ -1,3 +1,3 @@
 # dotfiles
 
-This is a collection of my dotfiles.
+A collection of my dotfiles.

@@ -54,5 +54,5 @@ brew install \
 # phpbrew dependencies
 brew install \
   bzip2 \
-  aniguruma \
+  oniguruma \
   libzip
