@@ -13,8 +13,9 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 5. [little fixes](#little-fixes)
 6. [web browser logins](#web-browser-logins)
 7. [ssh setup](#ssh-setup)
-8. [extra packages](#extra-packages)
-9. [manually install rtl8812au](#manually-install-rtl8812au)
+8. [terminal setup](#terminal-setup)
+9. [extra packages](#extra-packages)
+10. [manually install rtl8812au](#manually-install-rtl8812au)
 
 ### install xubuntu
 
@@ -63,6 +64,17 @@ Open up your browser and start logging inside your main websites.
 ### ssh setup
 
 Set up your multiple ssh keys correctly and test them.
+
+### terminal setup
+
+Configuration: .bash_rc
+Font: [Roboto Mono for Powerline](https://github.com/powerline/fonts)
+Font size: 14px
+Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
+Cursor: block & blinking
+Tab tab: always show
+Columns: 100
+Rows: 24
 
 ### extra packages
 
