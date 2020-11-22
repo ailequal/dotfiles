@@ -82,14 +82,14 @@ Set up your multiple ssh keys correctly and test them.
 
 ### terminal setup
 
-Configuration: .bash_profile
-Font: [Roboto Mono for Powerline](https://github.com/powerline/fonts)
-Font size: 14px
-Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
-Cursor: block & blinking
-Tab tab: always show
-Columns: 100
-Rows: 24
+* Configuration: .bash_profile
+* Font: [Roboto Mono for Powerline](https://github.com/powerline/fonts)
+* Font size: 14px
+* Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
+* Cursor: block & blinking
+* Tab tab: always show
+* Columns: 100
+* Rows: 24
 
 ### extra packages
 
