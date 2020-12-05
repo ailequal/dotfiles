@@ -15,7 +15,6 @@ fi
 # ps1 (zsh-prompt-generator.site) #
 ###################################
 
-# export PS1=">>> "
 PROMPT="%F{green}>>> %f"
 
 

@@ -6,7 +6,6 @@
 # ps1 (ezprompt.net) #
 ######################
 
-# ps1 (not compatible with zsh)
 export PS1="\[\e[32m\]\u\[\e[m\]\[\e[32m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]\[\e[35;40m\]\`parse_git_branch\`\[\e[m\]:\[\e[34m\]\W\[\e[m\] \[\e[34m\]\\$\[\e[m\] "
 
 # get current branch in git repo (ps1)
