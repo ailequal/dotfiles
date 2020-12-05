@@ -67,14 +67,14 @@ Set up your multiple ssh keys correctly and test them.
 
 ### terminal setup
 
-* Configuration: .bash_profile
-* Font: [Roboto Mono for Powerline](https://github.com/powerline/fonts)
-* Font size: 14px
-* Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
+* Configuration: .bashrc
+* Font: default
+* Font size: 12px
+* Color: default
 * Cursor: block & blinking
-* Tab tab: always show
-* Columns: 100
-* Rows: 24
+* Tab tab: default
+* Columns: 90
+* Rows: 28
 
 ### extra packages
 

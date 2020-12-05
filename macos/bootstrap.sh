@@ -26,6 +26,7 @@ brew cask install \
   keka \
   mactracker \
   mark-text \
+  paw \
   postman \
   sequel-pro \
   slack \

@@ -1,0 +1,11 @@
+[user]
+	name = ailequal
+	email = 37016865+ailequal@users.noreply.github.com
+[core]
+	excludesfile = /home/ailequal/.gitignore_global
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+

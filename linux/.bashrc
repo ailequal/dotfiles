@@ -1,16 +1,15 @@
-#################
-# .bash_profile #
-#################
+###########
+# .bashrc #
+###########
 
 
 # ps1 (ezprompt.net) #
 ######################
 
-export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
-# export LSCOLORS=ExFxBxDxCxegedabagacad # light theme
+# ps1 (not compatible with zsh)
+export PS1="\[\e[32m\]\u\[\e[m\]\[\e[32m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]\[\e[35;40m\]\`parse_git_branch\`\[\e[m\]:\[\e[34m\]\W\[\e[m\] \[\e[34m\]\\$\[\e[m\] "
 
-# get current branch in git repo
+# get current branch in git repo (ps1)
 function parse_git_branch() {
 	BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
 	if [ ! "${BRANCH}" == "" ]
@@ -22,7 +21,7 @@ function parse_git_branch() {
 	fi
 }
 
-# get current status of git repo
+# get current status of git repo (ps1)
 function parse_git_dirty {
 	status=`git status 2>&1 | tee`
 	dirty=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
@@ -57,7 +56,13 @@ function parse_git_dirty {
 	fi
 }
 
-export PS1="\[\e[32m\]\u\[\e[m\]\[\e[32m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]\[\e[35;40m\]\`parse_git_branch\`\[\e[m\]:\[\e[34m\]\W\[\e[m\] \[\e[34m\]\\$\[\e[m\] "
+
+# colors #
+##########
+
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
+# export LSCOLORS=ExFxBxDxCxegedabagacad # light theme
 
 
 # environment variables #
@@ -70,40 +75,3 @@ export NVM_DIR="$HOME/.nvm"
 
 # phpbrew
 [[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
-
-
-# aliases #
-###########
-
-# ciao-mondo
-alias ciao-mondo="echo hello-world"
-
-
-# functions #
-#############
-
-# initialize a github repo with a custom name
-function repo-hub() {
-		# generating files
-		mkdir $1 && cd $1
-		vim README.md
-
-		# generating github repo
-		git init
-		git add .
-		git commit -m 'First commit'
-		hub create
-		git push --set-upstream origin master
-}
-
-# initialize a git repo with a custom name
-function repo-local() {
-		# generating files
-		mkdir $1 && cd $1
-		vim README.md
-
-		# generating git repo
-		git init
-		git add .
-		git commit -m 'First commit'
-}
