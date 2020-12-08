@@ -2,7 +2,7 @@
 
 ## info
 
-This little guide is my reference when I am setting up a new machine with macOS (not exactly a standard dotfile).
+This little guide is my reference when I am setting up a new machine with macOS.
 
 ## steps
 
@@ -32,6 +32,10 @@ xcode-select --install
 ```
 
 ### little fixes
+
+These little fixes are sometimes helpful for weird installation errors.
+
+#### unsigned applications
 
 Enable unsigned applications.
 

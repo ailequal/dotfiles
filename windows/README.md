@@ -2,6 +2,10 @@
 
 ## info
 
+This little guide is my reference when I am setting up a new machine with Windows (no dotfiles sorry).
+
+## tips and tricks
+
 Here are listed some random tips to keep in mind when installing a fresh copy of Windows.
 
 * Never install Windows with an internet connection enabled and avoid logging with your account (if possible).

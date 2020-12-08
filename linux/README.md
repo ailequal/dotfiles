@@ -2,7 +2,7 @@
 
 ## info
 
-This little guide is my reference when I am setting up a new machine with GNU/Linux (not exactly a standard dotfile).
+This little guide is my reference when I am setting up a new machine with GNU/Linux.
 
 ## steps
 
@@ -45,6 +45,8 @@ Settings Manager > Set everything here
 * set all keyboards shortcut
 
 ### little fixes
+
+These fixes are needed for my ThinkPad X250 running Xubuntu 20.04 LTS.
 
 #### natural touchpad scroll
 
