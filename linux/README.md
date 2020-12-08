@@ -2,7 +2,7 @@
 
 ## info
 
-This little guide is my reference when I am setting up a new machine with GNU/Linux (not exactly a standard dotfile). Right now I am working with a ThinkPad X250 with [Xubuntu 20.04 Focal Fossa](https://xubuntu.org/release/20-04/) as my main distro, so these steps below are written for that specific distro mainly.
+This little guide is my reference when I am setting up a new machine with GNU/Linux (not exactly a standard dotfile).
 
 ## steps
 
@@ -15,7 +15,8 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 7. [ssh setup](#ssh-setup)
 8. [terminal setup](#terminal-setup)
 9. [extra packages](#extra-packages)
-10. [manually install rtl8812au](#manually-install-rtl8812au)
+10. [dotfiles](#dotfiles)
+11. [manually install rtl8812au](#manually-install-rtl8812au)
 
 ### install xubuntu
 
@@ -85,7 +86,10 @@ These extra packages must be installed manually.
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
 
+### dotfiles
+
+Now add the dotfiles to your system.
+
 ### manually install rtl8812au
 
 [rtl8812au](https://github.com/aircrack-ng/rtl8812au) for the TP-Link Archer T2U Nano.
-

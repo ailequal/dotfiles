@@ -2,7 +2,7 @@
 
 ## info
 
-This little guide is my reference when I am setting up a new machine with macOS (not exactly a standard dotfile). Right now I am working with a MacBook Pro 13-inch Early 2015 with macOS Mojave 10.14.6 as my main operative system, so these steps below are written for that specific OS mainly.
+This little guide is my reference when I am setting up a new machine with macOS (not exactly a standard dotfile).
 
 ## steps
 
@@ -15,6 +15,7 @@ This little guide is my reference when I am setting up a new machine with macOS 
 7. [ssh setup](#ssh-setup)
 8. [terminal setup](#terminal-setup)
 9. [extra packages](#extra-packages)
+10. [dotfiles](#dotfiles)
 
 ### install macos
 
@@ -99,3 +100,6 @@ These extra packages must be installed manually.
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
 
+### dotfiles
+
+Now add the dotfiles to your system.
