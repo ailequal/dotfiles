@@ -26,6 +26,7 @@ brew cask install \
   keka \
   mactracker \
   mark-text \
+  monitorcontrol \
   paw \
   postman \
   sequel-pro \
