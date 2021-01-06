@@ -6,7 +6,7 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 
 ## steps
 
-1. [install xubuntu](#install-xubuntu)
+1. [install popos](#install-popos)
 2. [update everything](#update-everything)
 3. [bootstrap.sh](#bootstrapsh)
 4. [settings setup](#settings-setup)
@@ -16,11 +16,10 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 8. [terminal setup](#terminal-setup)
 9. [extra packages](#extra-packages)
 10. [dotfiles](#dotfiles)
-11. [manually install rtl8812au](#manually-install-rtl8812au)
 
-### install xubuntu
+### install popos
 
-[Download](https://xubuntu.org/download/) and install Xubuntu on your machine, set your username, hostname, password and so on.
+[Download](https://pop.system76.com) and install Pop!_OS on your machine, set your username, hostname, password and so on.
 
 ### update everything
 
@@ -38,27 +37,14 @@ chmod +x ./bootstrap.sh && ./bootstrap.sh
 
 ### settings setup
 
-Settings Manager > Set everything here
+Settings > Set everything here
 
 * install language support
-* set panel setup
-* set all keyboards shortcut
+* set hostname
 
 ### little fixes
 
-These fixes are needed for my ThinkPad X250 running Xubuntu 20.04 LTS.
-
-#### natural touchpad scroll
-
-Session and Startup > Application Autostart > +Add
-
-```shell
-synclient VertScrollDelta=-39
-```
-
-#### screen lags
-
-Settings Manager > Window Manager Tweaks > Compositor > Enable display compositing > OFF
+Nothing here.
 
 ### web browser logins
 
@@ -82,8 +68,6 @@ Set up your multiple ssh keys correctly and test them.
 ### extra packages
 
 These extra packages must be installed manually.
-* [GitHub Desktop](https://github.com/shiftkey/desktop)
-* [Typora](https://typora.io)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
@@ -91,7 +75,3 @@ These extra packages must be installed manually.
 ### dotfiles
 
 Now add the dotfiles to your system.
-
-### manually install rtl8812au
-
-[rtl8812au](https://github.com/aircrack-ng/rtl8812au) for the TP-Link Archer T2U Nano.
