@@ -18,6 +18,7 @@ sudo snap install postman
 sudo snap install telegram-desktop
 sudo snap install youtube-dl
 sudo snap install typora
+sudo snap install hub --classic
 
 # apt packages
 sudo apt -y install \
@@ -30,8 +31,7 @@ sudo apt -y install \
   cheese \
   vagrant \
   htop \
-  hub \
-  indicator-multiload
+  indicator-multiload \
   github-desktop \
   notepadqq \
   pngquant \
