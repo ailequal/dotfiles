@@ -49,6 +49,7 @@ brew install \
   neofetch \
   pngquant \
   speedtest-cli \
+  tig \
   youtube-dl \
   vim \
   wp-cli

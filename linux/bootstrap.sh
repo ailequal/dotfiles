@@ -36,6 +36,7 @@ sudo apt -y install \
   notepadqq \
   pngquant \
   speedtest-cli \
+  tig \
   vim \
   xclip \
   wavemon \
