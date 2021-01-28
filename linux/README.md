@@ -71,6 +71,7 @@ These extra packages must be installed manually.
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
+* [freon](https://github.com/UshakovVasilii/gnome-shell-extension-freon)
 
 ### dotfiles
 

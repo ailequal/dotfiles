@@ -29,9 +29,11 @@ sudo apt -y install \
   mpv \
   caffeine \
   cheese \
+  gnome-tweak-tool \
   vagrant \
   htop \
   indicator-multiload \
+  lm-sensors \
   github-desktop \
   notepadqq \
   pngquant \
