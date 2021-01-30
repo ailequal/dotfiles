@@ -32,7 +32,6 @@ sudo apt -y install \
   gnome-tweak-tool \
   vagrant \
   htop \
-  indicator-multiload \
   lm-sensors \
   github-desktop \
   notepadqq \
