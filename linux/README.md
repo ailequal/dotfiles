@@ -72,6 +72,8 @@ These extra packages must be installed manually.
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
 * [freon](https://github.com/UshakovVasilii/gnome-shell-extension-freon)
+* [typora](https://typora.io)
+* [chrome](https://www.google.com/chrome)
 
 ### dotfiles
 

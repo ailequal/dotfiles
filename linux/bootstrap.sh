@@ -16,9 +16,6 @@ sudo snap install code --classic
 sudo snap install chromium
 sudo snap install postman
 sudo snap install telegram-desktop
-sudo snap install youtube-dl
-sudo snap install typora
-sudo snap install hub --classic
 
 # apt packages
 sudo apt -y install \
@@ -32,9 +29,11 @@ sudo apt -y install \
   gnome-tweak-tool \
   vagrant \
   htop \
+  hub \
   lm-sensors \
   github-desktop \
   notepadqq \
+  python3-pip \
   pngquant \
   speedtest-cli \
   tig \
@@ -44,6 +43,9 @@ sudo apt -y install \
   php7.4-cli \
   composer \
   nodejs
+
+# pip packages
+sudo pip install --upgrade youtube_dl
 
 # phpbrew dependencies
 # sudo apt -y install \
