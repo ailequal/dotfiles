@@ -17,6 +17,9 @@ sudo snap install chromium
 sudo snap install postman
 sudo snap install telegram-desktop
 
+# flatpak packages
+flatpak install flathub com.github.marktext.marktext
+
 # apt packages
 sudo apt -y install \
   tree \
