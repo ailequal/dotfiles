@@ -219,9 +219,9 @@
 	<key>VisualBellOnlyWhenMuted</key>
 	<false/>
 	<key>columnCount</key>
-	<integer>104</integer>
+	<integer>100</integer>
 	<key>name</key>
-	<string>Midnight</string>
+	<string>midnight</string>
 	<key>rowCount</key>
 	<integer>24</integer>
 	<key>type</key>

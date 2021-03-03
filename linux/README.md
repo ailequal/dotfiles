@@ -62,8 +62,8 @@ Set up your multiple ssh keys correctly and test them.
 * Color: default
 * Cursor: block & blinking
 * Tab tab: default
-* Columns: 90
-* Rows: 28
+* Columns: 100
+* Rows: 24
 
 ### extra packages
 
