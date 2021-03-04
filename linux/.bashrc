@@ -7,8 +7,8 @@
 ##########
 
 # include .alias if it exists
-if [ -f ~/.alias ]; then
-  . ~/.alias;
+if [ -f ~/.bash_aliases ]; then
+  . ~/.bash_aliases;
 fi
 
 

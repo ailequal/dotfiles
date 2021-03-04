@@ -9,6 +9,8 @@
 # ciao-mondo
 alias ciao-mondo="echo hello-world"
 
+# ls with color
+alias ls='ls --color=auto'
 
 # functions #
 #############
