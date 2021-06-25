@@ -59,11 +59,7 @@ Then you can launch the bootstrap.sh script, it will automatically install lots 
 chmod +x ./bootstrap.sh && ./bootstrap.sh
 ```
 
-These packages will all ask for root permission before installing anything on the system.
-
-```shell
-brew cask install 1password docker intel-power-gadget vagrant virtualbox torguard zoomus
-```
+Keep in mind that some packages will all ask for root permission before installing anything on the system.
 
 ### settings setup
 

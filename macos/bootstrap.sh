@@ -10,10 +10,12 @@
 brew update && brew upgrade
 
 # casks
-brew cask install \
+brew install --cask \
+  1password \
   appcleaner \
   coconutbattery \
   cyberduck \
+  docker \
   firefox \
   homebrew/cask-versions/firefox-developer-edition \
   gitkraken \
@@ -34,9 +36,13 @@ brew cask install \
   spotify \
   sublime-text \
   telegram \
+  typora \
   transmission \
+  vagrant \
+  virtualbox \
   visual-studio-code \
-  vlc
+  vlc \
+  zoomus
 
 # formulae
 brew install \
