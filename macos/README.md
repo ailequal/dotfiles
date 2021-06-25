@@ -96,6 +96,7 @@ Set up your multiple ssh keys correctly and test them.
 
 These extra packages must be installed manually.
 
+* [devilbox](https://github.com/cytopia/devilbox)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
