@@ -58,7 +58,7 @@ Set up your multiple ssh keys correctly and test them.
 
 * Configuration: .bashrc
 * Font: default
-* Font size: 12px
+* Font size: 14px
 * Color: default
 * Cursor: block & blinking
 * Tab tab: default
@@ -68,12 +68,13 @@ Set up your multiple ssh keys correctly and test them.
 ### extra packages
 
 These extra packages must be installed manually.
+
+* [chrome](https://www.google.com/chrome)
+* [devilbox](https://github.com/cytopia/devilbox)
+* [freon](https://github.com/UshakovVasilii/gnome-shell-extension-freon)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
-* [freon](https://github.com/UshakovVasilii/gnome-shell-extension-freon)
-* [typora](https://typora.io)
-* [chrome](https://www.google.com/chrome)
 
 ### dotfiles
 

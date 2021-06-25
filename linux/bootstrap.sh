@@ -16,51 +16,52 @@ sudo snap install code --classic
 sudo snap install chromium
 sudo snap install postman
 sudo snap install telegram-desktop
+sudo snap install typora
 
 # flatpak packages
 flatpak install flathub com.github.marktext.marktext
 
 # apt packages
 sudo apt -y install \
-  tree \
-  neofetch \
-  virtualbox \
-  vlc \
-  mpv \
   caffeine \
   cheese \
+  composer \
+  github-desktop \
   gnome-tweak-tool \
-  vagrant \
   htop \
   hub \
   lm-sensors \
-  github-desktop \
+  mpv \
+  neofetch \
+  nodejs \
   notepadqq \
-  python3-pip \
+  php7.4-cli \
   pngquant \
+  python3-pip \
   speedtest-cli \
   tig \
+  tree \
+  vagrant \
   vim \
-  xclip \
+  virtualbox \
+  vlc \
   wavemon \
-  php7.4-cli \
-  composer \
-  nodejs
+  xclip
 
 # pip packages
 sudo pip install --upgrade youtube_dl
 
 # phpbrew dependencies
-# sudo apt -y install \
-#   build-essential \
-#   libbz2-dev \
-#   libreadline-dev \
-#   libsqlite3-dev \
-#   libssl-dev \
-#   libxml2-dev \
-#   libxslt1-dev \
-#   php7.4-bz2 \
-#   pkg-config \
-#   libcurl4-openssl-dev \
-#   libonig-dev \
-#   libzip-dev \
+sudo apt -y install \
+  build-essential \
+  libbz2-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  libssl-dev \
+  libxml2-dev \
+  libxslt1-dev \
+  php7.4-bz2 \
+  pkg-config \
+  libcurl4-openssl-dev \
+  libonig-dev \
+  libzip-dev \
