@@ -9,8 +9,14 @@
 # ciao-mondo
 alias ciao-mondo="echo hello-world"
 
-# ls with color
+# ls
 alias ls='ls --color=auto'
+
+# youtube
+alias yt-dl-music="youtube-dl -f bestaudio -x --audio-format m4a $1"
+alias yt-dl-video="youtube-dl -f bestvideo+bestaudio $1"
+alias yt-stream="mpv --ytdl-format="bestvideo[height<=?720]+bestaudio/best""
+
 
 # functions #
 #############
