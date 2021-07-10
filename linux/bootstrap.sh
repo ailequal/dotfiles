@@ -19,7 +19,7 @@ sudo snap install telegram-desktop
 sudo snap install typora
 
 # flatpak packages
-flatpak install flathub com.github.marktext.marktext
+# flatpak install flathub com.github.marktext.marktext
 
 # apt packages
 sudo apt -y install \
@@ -30,14 +30,15 @@ sudo apt -y install \
   gnome-tweak-tool \
   htop \
   hub \
-  lm-sensors \
   mpv \
   neofetch \
   nodejs \
   notepadqq \
-  php7.4-cli \
+  npm \
+  php \
+  pip \
   pngquant \
-  python3-pip \
+  python \
   speedtest-cli \
   tig \
   tree \
@@ -52,16 +53,16 @@ sudo apt -y install \
 sudo pip install --upgrade youtube_dl
 
 # phpbrew dependencies
-sudo apt -y install \
-  build-essential \
-  libbz2-dev \
-  libreadline-dev \
-  libsqlite3-dev \
-  libssl-dev \
-  libxml2-dev \
-  libxslt1-dev \
-  php7.4-bz2 \
-  pkg-config \
-  libcurl4-openssl-dev \
-  libonig-dev \
-  libzip-dev \
+# sudo apt -y install \
+#   build-essential \
+#   libbz2-dev \
+#   libreadline-dev \
+#   libsqlite3-dev \
+#   libssl-dev \
+#   libxml2-dev \
+#   libxslt1-dev \
+#   php7.4-bz2 \
+#   pkg-config \
+#   libcurl4-openssl-dev \
+#   libonig-dev \
+#   libzip-dev \
