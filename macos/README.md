@@ -49,6 +49,12 @@ Enable a specific unsigned application.
 xattr -d com.apple.quarantine /Applications/Application.app
 ```
 
+#### spotlight
+
+Prevent Spotlight from searching into:
+* ~/repos
+* ~/sites
+
 ### bootstrap.sh
 
 First install [homebrew](https://brew.sh) package manager following the official guide.
