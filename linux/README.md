@@ -44,7 +44,10 @@ Settings > Set everything here
 
 ### little fixes
 
-Nothing here.
+* Add "caffeine-indicator" as a startup application.
+* Super => Workspaces
+* Super + Space => Launch and switch applications
+* Ctrl + Space => Switch to next input source
 
 ### web browser logins
 
@@ -71,6 +74,7 @@ These extra packages must be installed manually.
 
 * [chrome](https://www.google.com/chrome)
 * [devilbox](https://github.com/cytopia/devilbox)
+* [docker](https://docs.docker.com/engine/install/ubuntu)
 * [freon](https://github.com/UshakovVasilii/gnome-shell-extension-freon)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
