@@ -54,6 +54,7 @@ xattr -d com.apple.quarantine /Applications/Application.app
 Prevent Spotlight from searching into:
 * ~/repos
 * ~/sites
+* ~/\*jetbrains\*
 
 ### bootstrap.sh
 
