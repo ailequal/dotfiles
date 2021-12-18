@@ -52,15 +52,15 @@ sudo apt -y install xclip
 sudo pip install --upgrade youtube_dl
 
 # phpbrew dependencies
-sudo apt-y install build-essential
-sudo apt-y install libbz2-dev
-sudo apt-y install libreadline-dev
-sudo apt-y install libsqlite3-dev
-sudo apt-y install libssl-dev
-sudo apt-y install libxml2-dev
-sudo apt-y install libxslt1-dev
-sudo apt-y install php7.4-bz2
-sudo apt-y install pkg-config
-sudo apt-y install libcurl4-openssl-dev
-sudo apt-y install libonig-dev
-sudo apt-y install libzip-dev
+# sudo apt-y install build-essential
+# sudo apt-y install libbz2-dev
+# sudo apt-y install libreadline-dev
+# sudo apt-y install libsqlite3-dev
+# sudo apt-y install libssl-dev
+# sudo apt-y install libxml2-dev
+# sudo apt-y install libxslt1-dev
+# sudo apt-y install php7.4-bz2
+# sudo apt-y install pkg-config
+# sudo apt-y install libcurl4-openssl-dev
+# sudo apt-y install libonig-dev
+# sudo apt-y install libzip-dev

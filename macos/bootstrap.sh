@@ -61,7 +61,7 @@ brew install \
   wp-cli
 
 # phpbrew dependencies
-brew install \
-  bzip2 \
-  oniguruma \
-  libzip
+# brew install \
+#   bzip2 \
+#   oniguruma \
+#   libzip
