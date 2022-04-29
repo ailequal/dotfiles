@@ -6,7 +6,7 @@
 # import #
 ##########
 
-# include .alias if it exists
+# include .bash_aliases if it exists
 if [ -f ~/.bash_aliases ]; then
   . ~/.bash_aliases;
 fi
@@ -22,3 +22,6 @@ fi
 
 # phpbrew
 # [[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
+
+# jetbrains
+# export PATH="$PATH:$HOME/bin"

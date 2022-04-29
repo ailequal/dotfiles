@@ -24,6 +24,7 @@ brew install --cask \
   handbrake \
   istat-menus \
   iterm2 \
+  jetbrains-toolbox \
   keepingyouawake \
   keka \
   mactracker \

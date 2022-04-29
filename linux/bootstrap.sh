@@ -26,7 +26,7 @@ sudo apt -y install caffeine
 sudo apt -y install cheese
 sudo apt -y install composer
 sudo apt -y install github-desktop
-sudo apt -y install gnome-tweak-tool
+sudo apt -y install gnome-tweaks
 sudo apt -y install htop
 sudo apt -y install hub
 sudo apt -y install mpv

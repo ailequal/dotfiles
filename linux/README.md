@@ -47,6 +47,7 @@ Settings > Set everything here
 
 * Add "caffeine-indicator" as a startup application.
 * Set the super key to activate the workspaces.
+* Create "/home/$USER/bin" folder (the JetBrains lauch scripts will go here).
 
 ### web browser logins
 
@@ -76,6 +77,7 @@ These extra packages must be installed manually.
 * [docker](https://docs.docker.com/engine/install/ubuntu)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
+* [toolbox app](https://www.jetbrains.com/toolbox-app)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
 
 ### dotfiles

@@ -6,9 +6,9 @@
 # import #
 ##########
 
-# include .alias if it exists
-if [ -f ~/.alias ]; then
-  . ~/.alias;
+# include .zsh_aliases if it exists
+if [ -f ~/.zsh_aliases ]; then
+  . ~/.zsh_aliases;
 fi
 
 
