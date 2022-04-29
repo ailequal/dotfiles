@@ -30,6 +30,7 @@ sudo apt -y update && sudo apt -y upgrade
 ### bootstrap.sh
 
 Launch the bootstrap.sh script, it will automatically install lots of useful packages.
+Otherwise, manually select which one you'd like to install.
 
 ```shell
 chmod +x ./bootstrap.sh && ./bootstrap.sh
@@ -45,9 +46,7 @@ Settings > Set everything here
 ### little fixes
 
 * Add "caffeine-indicator" as a startup application.
-* Super => Workspaces
-* Super + Space => Launch and switch applications
-* Ctrl + Space => Switch to next input source
+* Set the super key to activate the workspaces.
 
 ### web browser logins
 
@@ -75,7 +74,6 @@ These extra packages must be installed manually.
 * [chrome](https://www.google.com/chrome)
 * [devilbox](https://github.com/cytopia/devilbox)
 * [docker](https://docs.docker.com/engine/install/ubuntu)
-* [freon](https://github.com/UshakovVasilii/gnome-shell-extension-freon)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)

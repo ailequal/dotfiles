@@ -31,9 +31,32 @@ Then run this command in the terminal.
 xcode-select --install
 ```
 
-### little fixes
+### bootstrap.sh
 
-These little fixes are sometimes helpful for weird installation errors.
+First install [homebrew](https://brew.sh) package manager following the official guide.
+
+Then you can launch the bootstrap.sh script, it will automatically install lots of useful packages.
+Otherwise, manually select which one you'd like to install.
+
+```shell
+chmod +x ./bootstrap.sh && ./bootstrap.sh
+```
+
+Keep in mind that some packages will all ask for root permission before installing anything on the system.
+
+### settings setup
+
+System Preferences > Set everything here
+
+* set cloud account sync
+* set Finder settings
+* set panel setup with iStat Menus
+* set widgets
+* install applications from App Store
+* restore data from Time Machine
+* setup dock
+
+### little fixes
 
 #### unsigned applications
 
@@ -56,30 +79,6 @@ Prevent Spotlight from searching into:
 * ~/sites
 * ~/\*jetbrains\*
 
-### bootstrap.sh
-
-First install [homebrew](https://brew.sh) package manager following the official guide.
-
-Then you can launch the bootstrap.sh script, it will automatically install lots of useful packages.
-
-```shell
-chmod +x ./bootstrap.sh && ./bootstrap.sh
-```
-
-Keep in mind that some packages will all ask for root permission before installing anything on the system.
-
-### settings setup
-
-System Preferences > Set everything here
-
-* set cloud account sync
-* set Finder settings
-* set panel setup with iStat Menus
-* set widgets
-* install applications from App Store
-* restore data from Time Machine
-* setup dock
-
 ### web browser logins
 
 Open up your browser and start logging inside your main websites.
@@ -91,7 +90,7 @@ Set up your multiple ssh keys correctly and test them.
 ### terminal setup
 
 * Configuration: .bash_profile
-* Font: [Roboto Mono for Powerline](https://github.com/powerline/fonts)
+* Font: default
 * Font size: 14px
 * Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
 * Cursor: block & blinking
