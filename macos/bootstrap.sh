@@ -15,9 +15,11 @@ brew install --cask \
   appcleaner \
   coconutbattery \
   cyberduck \
+  discord \
   docker \
   firefox \
   homebrew/cask-versions/firefox-developer-edition \
+  logitech-options \
   gitkraken \
   google-backup-and-sync \
   google-chrome \
