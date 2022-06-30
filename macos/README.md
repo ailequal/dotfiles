@@ -36,7 +36,7 @@ xcode-select --install
 First install [homebrew](https://brew.sh) package manager following the official guide.
 
 Then you can launch the bootstrap.sh script, it will automatically install lots of useful packages.
-Otherwise, manually select which one you'd like to install.
+Otherwise, manually select which one you'd like to install (just delete or comment the relative lines).
 
 ```shell
 chmod +x ./bootstrap.sh && ./bootstrap.sh
@@ -77,7 +77,7 @@ xattr -d com.apple.quarantine /Applications/Application.app
 Prevent Spotlight from searching into:
 * ~/repos
 * ~/sites
-* ~/\*jetbrains\*
+* ~/Downloads/random
 
 ### web browser logins
 
@@ -89,7 +89,7 @@ Set up your multiple ssh keys correctly and test them.
 
 ### terminal setup
 
-* Configuration: .bash_profile
+* Configuration: .zshrc
 * Font: default
 * Font size: 14px
 * Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)

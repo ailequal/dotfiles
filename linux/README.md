@@ -30,7 +30,7 @@ sudo apt -y update && sudo apt -y upgrade
 ### bootstrap.sh
 
 Launch the bootstrap.sh script, it will automatically install lots of useful packages.
-Otherwise, manually select which one you'd like to install.
+Otherwise, manually select which one you'd like to install (just delete or comment the relative lines).
 
 ```shell
 chmod +x ./bootstrap.sh && ./bootstrap.sh
