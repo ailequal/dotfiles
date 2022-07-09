@@ -12,6 +12,32 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 
+# ps1 (ezprompt.net) #
+######################
+
+# ps1 (not compatible with zsh)
+export PS1="\[\e[32;32m\]>>>\[\e[m\]\[\e[32;34m\]\`parse_git_branch\`\[\e[m\] "
+
+# get current branch in git repo (ps1)
+function parse_git_branch() {
+  BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+  if [ ! "${BRANCH}" == "" ]
+  then
+    echo " (${BRANCH})"
+  else
+    echo ""
+  fi
+}
+
+
+# colors #
+##########
+
+# export CLICOLOR=1
+# export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
+# export LSCOLORS=ExFxBxDxCxegedabagacad # light theme
+
+
 # environment variables #
 #########################
 
