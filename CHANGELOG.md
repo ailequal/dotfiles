@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.3 - 2022-07-12
+
+* Enhancement - Updated .gitconfig with vim as the default text editor.
+
 ## 3.0.2 - 2022-07-09
 
 * Enhancement - Added custom ps1 prompt with git actual branch for the linux bash configuration.

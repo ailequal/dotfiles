@@ -3,6 +3,7 @@
   email = 37016865+ailequal@users.noreply.github.com
 [core]
   excludesfile = /home/ailequal/.gitignore_global
+        editor = vim
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
