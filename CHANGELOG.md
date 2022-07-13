@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.4 - 2022-07-13
+
+* Enhancement - Updated .gitconfig with "git lg" custom alias.
+
 ## 3.0.3 - 2022-07-12
 
 * Enhancement - Updated .gitconfig with vim as the default text editor.
