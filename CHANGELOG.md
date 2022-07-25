@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.5 - 2022-07-25
+
+* Enhancement - Added XFCE 4 default terminal.
+
 ## 3.0.4 - 2022-07-13
 
 * Enhancement - Updated .gitconfig with "git lg" custom alias.
