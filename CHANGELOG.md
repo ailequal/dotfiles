@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.6 - 2022-07-27
+
+* Enhancement - Add vi mode as default for bash and zsh.
+
 ## 3.0.5 - 2022-07-25
 
 * Enhancement - Added XFCE 4 default terminal.

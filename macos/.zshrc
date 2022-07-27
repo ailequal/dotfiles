@@ -53,6 +53,9 @@ export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
 # environment variables #
 #########################
 
+# vi keybindings
+bindkey -v
+
 # nvm
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
