@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.7 - 2022-08-01
+
+* Enhancement - Added doom emacs path for bash.
+
 ## 3.0.6 - 2022-07-27
 
 * Enhancement - Add vi mode as default for bash and zsh.

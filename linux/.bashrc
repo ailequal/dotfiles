@@ -54,3 +54,6 @@ set -o vi
 
 # jetbrains
 # export PATH="$PATH:$HOME/bin"
+
+# doom emacs
+# export PATH="$PATH:$HOME/.emacs.d/bin"
