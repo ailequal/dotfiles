@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1 - 2022-08-03
+
+* Enhancement - Updated .gitconfig with gpg support.
+
 ## 3.1.0 - 2022-08-03
 
 * Enhancement - Big cleaning and updates.
