@@ -18,9 +18,7 @@ brew install --cask \
   discord \
   docker \
   firefox \
-  homebrew/cask-versions/firefox-developer-edition \
   logitech-options \
-  gitkraken \
   google-backup-and-sync \
   google-chrome \
   handbrake \
@@ -39,7 +37,6 @@ brew install --cask \
   spotify \
   sublime-text \
   telegram \
-  typora \
   transmission \
   vagrant \
   virtualbox \
@@ -49,22 +46,19 @@ brew install --cask \
 
 # formulae
 brew install \
-  composer \
   ffmpeg \
   git \
   htop \
   hub \
+  lolcat \
   mpv \
   neofetch \
+  neovim \
+  php \
   pngquant \
   speedtest-cli \
   tig \
+  tmux \
+  tree \
   youtube-dl \
-  vim \
-  wp-cli
-
-# phpbrew dependencies
-# brew install \
-#   bzip2 \
-#   oniguruma \
-#   libzip
+  vim

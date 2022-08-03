@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0 - 2022-08-03
+
+* Enhancement - Big cleaning and updates.
+
 ## 3.0.7 - 2022-08-01
 
 * Enhancement - Added doom emacs path for bash.

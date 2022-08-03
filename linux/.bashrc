@@ -15,10 +15,10 @@ fi
 # ps1 (ezprompt.net) #
 ######################
 
-# ps1 (not compatible with zsh)
+# custom prompt
 export PS1="\[\e[32;32m\]>>>\[\e[m\]\[\e[32;34m\]\`parse_git_branch\`\[\e[m\] "
 
-# get current branch in git repo (ps1)
+# add git status to bash prompt
 function parse_git_branch() {
   BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
   if [ ! "${BRANCH}" == "" ]

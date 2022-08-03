@@ -30,7 +30,7 @@ sudo apt -y update && sudo apt -y upgrade
 ### bootstrap.sh
 
 Launch the bootstrap.sh script, it will automatically install lots of useful packages.
-Otherwise, manually select which one you'd like to install (just delete or comment the relative lines).
+Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
 
 ```shell
 chmod +x ./bootstrap.sh && ./bootstrap.sh
@@ -38,16 +38,18 @@ chmod +x ./bootstrap.sh && ./bootstrap.sh
 
 ### settings setup
 
-Settings > Set everything here
-
-* install language support
-* set hostname
+* Settings (set everything here).
+* Set file manager settings.
+* Restore data from backup (optional).
+* Setup dock (minimal).
+* Install language support.
+* Set hostname.
 
 ### little fixes
 
 * Add "caffeine-indicator" as a startup application.
 * Set the super key to activate the workspaces.
-* Create "/home/$USER/bin" folder (the JetBrains lauch scripts will go here).
+* Create "/home/$USER/bin" folder.
 
 ### web browser logins
 
@@ -55,7 +57,7 @@ Open up your browser and start logging inside your main websites.
 
 ### ssh setup
 
-Set up your multiple ssh keys correctly and test them.
+Set up your ssh keys correctly and test them.
 
 ### terminal setup
 
@@ -72,9 +74,12 @@ Set up your multiple ssh keys correctly and test them.
 
 These extra packages must be installed manually.
 
+* [1password](https://1password.com)
 * [chrome](https://www.google.com/chrome)
+* [composer](https://getcomposer.org)
 * [devilbox](https://github.com/cytopia/devilbox)
 * [docker](https://docs.docker.com/engine/install/ubuntu)
+* [doom emacs](https://github.com/doomemacs/doomemacs)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [toolbox app](https://www.jetbrains.com/toolbox-app)
@@ -82,4 +87,4 @@ These extra packages must be installed manually.
 
 ### dotfiles
 
-Now add the dotfiles to your system.
+Add the dotfiles to your system.

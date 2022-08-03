@@ -17,7 +17,7 @@ alias yt-str-video="mpv --ytdl-format=\"bestvideo[height<=?720]+bestaudio/best\"
 alias yt-up="sudo pip install --upgrade youtube_dl"
 
 # random
-alias ciao-mondo="echo hello-world"
+alias ciao-mondo="echo hello-world | lolcat"
 
 
 # functions #

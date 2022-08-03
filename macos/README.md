@@ -36,7 +36,7 @@ xcode-select --install
 First install [homebrew](https://brew.sh) package manager following the official guide.
 
 Then you can launch the bootstrap.sh script, it will automatically install lots of useful packages.
-Otherwise, manually select which one you'd like to install (just delete or comment the relative lines).
+Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
 
 ```shell
 chmod +x ./bootstrap.sh && ./bootstrap.sh
@@ -46,15 +46,15 @@ Keep in mind that some packages will all ask for root permission before installi
 
 ### settings setup
 
-System Preferences > Set everything here
-
-* set cloud account sync
-* set Finder settings
-* set panel setup with iStat Menus
-* set widgets
-* install applications from App Store
-* restore data from Time Machine
-* setup dock
+* Settings (set everything here).
+* Set cloud accounts sync.
+* Set Finder settings.
+* Set panel setup with iStat Menus.
+* Set widgets.
+* Install applications from App Store (primarly Magnet).
+* Restore data from Time Machine (optional).
+* Setup dock (minimal).
+* Set hostname.
 
 ### little fixes
 
@@ -85,7 +85,7 @@ Open up your browser and start logging inside your main websites.
 
 ### ssh setup
 
-Set up your multiple ssh keys correctly and test them.
+Set up your ssh keys correctly and test them.
 
 ### terminal setup
 
@@ -102,7 +102,9 @@ Set up your multiple ssh keys correctly and test them.
 
 These extra packages must be installed manually.
 
+* [composer](https://getcomposer.org)
 * [devilbox](https://github.com/cytopia/devilbox)
+* [doom emacs](https://github.com/doomemacs/doomemacs)
 * [karabiner-elements](https://karabiner-elements.pqrs.org)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
