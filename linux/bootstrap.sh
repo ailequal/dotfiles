@@ -31,6 +31,7 @@ sudo apt -y install gimp
 sudo apt -y install gitg
 sudo apt -y install github-desktop
 sudo apt -y install gnome-tweaks
+sudo apt -y install gpg
 sudo apt -y install handbrake
 sudo apt -y install htop
 sudo apt -y install hub

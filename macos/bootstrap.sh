@@ -21,6 +21,7 @@ brew install --cask \
   logitech-options \
   google-backup-and-sync \
   google-chrome \
+  gpg \
   handbrake \
   istat-menus \
   iterm2 \
