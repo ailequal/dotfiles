@@ -21,7 +21,6 @@ brew install --cask \
   logitech-options \
   google-backup-and-sync \
   google-chrome \
-  gpg \
   handbrake \
   istat-menus \
   iterm2 \
@@ -49,6 +48,7 @@ brew install --cask \
 brew install \
   ffmpeg \
   git \
+  gnupg \
   htop \
   hub \
   lolcat \
@@ -56,6 +56,7 @@ brew install \
   neofetch \
   neovim \
   php \
+  pinentry-mac \
   pngquant \
   speedtest-cli \
   tig \

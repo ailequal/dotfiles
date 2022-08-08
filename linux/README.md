@@ -12,7 +12,7 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 4. [settings setup](#settings-setup)
 5. [little fixes](#little-fixes)
 6. [web browser logins](#web-browser-logins)
-7. [ssh setup](#ssh-setup)
+7. [ssh and gpg setup](#ssh-and-gpg-setup)
 8. [terminal setup](#terminal-setup)
 9. [extra packages](#extra-packages)
 10. [dotfiles](#dotfiles)
@@ -55,9 +55,9 @@ chmod +x ./bootstrap.sh && ./bootstrap.sh
 
 Open up your browser and start logging inside your main websites.
 
-### ssh setup
+### ssh and gpg setup
 
-Set up your ssh keys correctly and test them.
+Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9ffcf) and [gpg](https://gist.github.com/ailequal/fc9b12cb35f119dcdc1a2f4406bf8b54) keys correctly and test them.
 
 ### terminal setup
 

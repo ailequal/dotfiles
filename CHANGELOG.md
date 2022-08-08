@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0 - 2022-08-08
+
+* Enhancement - Added ssh and gpg guides.
+
 ## 3.1.2 - 2022-08-03
 
 * Enhancement - Added gpg package.
