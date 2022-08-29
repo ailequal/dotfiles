@@ -9,24 +9,10 @@
 # update os && upgrade os
 sudo apt -y update && sudo apt -y upgrade
 
-# snaps packages
-sudo apt install snapd
-sudo snap install hello-world
-sudo snap install 0ad
-sudo snap install bovo
-sudo snap install code --classic
-sudo snap install chromium
-sudo snap install marktext
-sudo snap install postman
-sudo snap install slack
-sudo snap install telegram-desktop
-
-# flatpak packages
-flatpak install flathub com.google.Chrome
-
 # apt packages
 sudo apt -y install caffeine
 sudo apt -y install cheese
+sudo apt -y install code
 sudo apt -y install gimp
 sudo apt -y install gitg
 sudo apt -y install github-desktop
@@ -46,6 +32,7 @@ sudo apt -y install php
 sudo apt -y install pip
 sudo apt -y install pngquant
 sudo apt -y install python
+sudo apt -y install python-is-python3
 sudo apt -y install speedtest-cli
 sudo apt -y install thunar
 sudo apt -y install tig
@@ -58,5 +45,19 @@ sudo apt -y install vlc
 sudo apt -y install wavemon
 sudo apt -y install xclip
 
+# flatpak packages
+flatpak install flathub com.getpostman.Postman
+flatpak install flathub com.google.Chrome
+flatpak install flathub com.play0ad.zeroad
+flatpak install flathub com.slack.Slack
+flatpak install flathub com.spotify.Client
+flatpak install flathub com.spotify.Client
+flatpak install flathub net.mediaarea.MediaInfo
+flatpak install flathub org.telegram.desktop
+
+# snap packages (deprecated)
+# sudo apt install snapd
+# sudo snap install hello-world
+
 # pip packages
-sudo pip install --upgrade youtube_dl
+pip install --upgrade youtube_dl

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.1 - 2022-08-29
+
+* Enhancement - Updated bootstrap.sh for linux (removed snap packages for flatpak).
+
 ## 3.2.0 - 2022-08-08
 
 * Enhancement - Added ssh and gpg guides.
