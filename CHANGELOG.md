@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.0 - 2022-12-04
+
+* Add - Added .tmux.conf file (for linux).
+* Add - Added .vimrc file (for linux).
+
 ## 3.2.1 - 2022-08-29
 
 * Enhancement - Updated bootstrap.sh for linux (removed snap packages for flatpak).

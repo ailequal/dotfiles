@@ -6,7 +6,7 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 
 ## steps
 
-1. [install popos](#install-popos)
+1. [install linux](#install-linux)
 2. [update everything](#update-everything)
 3. [bootstrap.sh](#bootstrapsh)
 4. [settings setup](#settings-setup)
@@ -17,9 +17,9 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 9. [extra packages](#extra-packages)
 10. [dotfiles](#dotfiles)
 
-### install popos
+### install linux
 
-[Download](https://pop.system76.com) and install Pop!_OS on your machine, set your username, hostname, password and so on.
+Download your distro of choice and install it on your machine (I'll use a Debian based one as reference). Set your username, hostname, password and so on.
 
 ### update everything
 
