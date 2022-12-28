@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.1 - 2022-12-28
+
+* Add - Added git-backup.sh for linux and macos.
+
 ## 3.3.0 - 2022-12-04
 
 * Add - Added .tmux.conf file (for linux).
