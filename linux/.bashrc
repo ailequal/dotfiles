@@ -44,6 +44,12 @@ function parse_git_branch() {
 # vi keybindings
 set -o vi
 
+# local/bin
+# export PATH="$PATH:$HOME/.local/bin"
+
+# doom emacs
+# export PATH="$PATH:$HOME/.emacs.d/bin"
+
 # nvm
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -51,9 +57,3 @@ set -o vi
 
 # phpbrew
 # [[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
-
-# jetbrains
-# export PATH="$PATH:$HOME/bin"
-
-# doom emacs
-# export PATH="$PATH:$HOME/.emacs.d/bin"

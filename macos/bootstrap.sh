@@ -62,5 +62,5 @@ brew install \
   tig \
   tmux \
   tree \
-  youtube-dl \
+  yt-dlp \
   vim

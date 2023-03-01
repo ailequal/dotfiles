@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.0 - 2023-03-01
+
+* Add - Moved from youtube-dl to yt-dlp.
+
 ## 3.3.1 - 2022-12-28
 
 * Add - Added git-backup.sh for linux and macos.

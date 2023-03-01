@@ -60,4 +60,4 @@ flatpak install flathub org.telegram.desktop
 # sudo snap install hello-world
 
 # pip packages
-pip install --upgrade youtube_dl
+python3 -m pip install -U yt-dlp
