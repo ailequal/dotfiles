@@ -15,12 +15,10 @@ sudo apt -y install cheese
 sudo apt -y install code
 sudo apt -y install gimp
 sudo apt -y install gitg
-sudo apt -y install github-desktop
 sudo apt -y install gnome-tweaks
 sudo apt -y install gpg
 sudo apt -y install handbrake
 sudo apt -y install htop
-sudo apt -y install hub
 sudo apt -y install kate
 sudo apt -y install konsole
 sudo apt -y install lolcat
@@ -46,18 +44,20 @@ sudo apt -y install wavemon
 sudo apt -y install xclip
 
 # flatpak packages
-flatpak install flathub com.getpostman.Postman
-flatpak install flathub com.google.Chrome
-flatpak install flathub com.play0ad.zeroad
-flatpak install flathub com.slack.Slack
-flatpak install flathub com.spotify.Client
-flatpak install flathub com.spotify.Client
-flatpak install flathub net.mediaarea.MediaInfo
-flatpak install flathub org.telegram.desktop
+# flatpak install flathub com.getpostman.Postman
+# flatpak install flathub com.google.Chrome
+# flatpak install flathub com.play0ad.zeroad
+# flatpak install flathub com.slack.Slack
+# flatpak install flathub com.spotify.Client
+# flatpak install flathub org.telegram.desktop
 
 # snap packages
-# sudo apt install snapd
-# sudo snap install hello-world
+sudo snap install 0ad
+sudo snap install 1password
+sudo snap install postman
+sudo snap install slack
+sudo snap install spotify
+sudo snap install telegram-desktop
 
 # pip packages
 python3 -m pip install -U yt-dlp

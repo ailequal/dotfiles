@@ -46,7 +46,7 @@ Keep in mind that some packages will all ask for root permission before installi
 
 ### settings setup
 
-* Settings (set everything here).
+* Set system settings.
 * Set cloud accounts sync.
 * Set Finder settings.
 * Set panel setup with iStat Menus.
@@ -112,4 +112,4 @@ These extra packages must be installed manually.
 
 ### dotfiles
 
-Now add the dotfiles to your system.
+Add the dotfiles to your system.

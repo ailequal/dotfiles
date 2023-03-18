@@ -50,7 +50,6 @@ brew install \
   git \
   gnupg \
   htop \
-  hub \
   lolcat \
   mpv \
   neofetch \

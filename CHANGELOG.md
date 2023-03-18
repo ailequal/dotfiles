@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.0 - 2023-03-18
+
+* Enhancement - General cleanup.
+
 ## 3.4.0 - 2023-03-01
 
 * Add - Moved from youtube-dl to yt-dlp.

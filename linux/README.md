@@ -38,7 +38,7 @@ chmod +x ./bootstrap.sh && ./bootstrap.sh
 
 ### settings setup
 
-* Settings (set everything here).
+* Set system settings.
 * Set file manager settings.
 * Restore data from backup (optional).
 * Setup dock (minimal).
@@ -48,8 +48,7 @@ chmod +x ./bootstrap.sh && ./bootstrap.sh
 ### little fixes
 
 * Add "caffeine-indicator" as a startup application.
-* Set the super key to activate the workspaces.
-* Create "/home/$USER/bin" folder.
+* Create "/home/$USER/.local/bin" folder.
 
 ### web browser logins
 
