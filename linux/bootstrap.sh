@@ -55,7 +55,7 @@ flatpak install flathub com.spotify.Client
 flatpak install flathub net.mediaarea.MediaInfo
 flatpak install flathub org.telegram.desktop
 
-# snap packages (deprecated)
+# snap packages
 # sudo apt install snapd
 # sudo snap install hello-world
 
