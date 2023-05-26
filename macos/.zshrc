@@ -63,3 +63,7 @@ bindkey -v
 
 # phpbrew
 # [[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
+
+# connect to X11 through IP display
+export IP=$(ipconfig getifaddr en0)
+export DISPLAY=$IP:0

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.1 - 2023-05-26
+
+* Add - Added variables for connecting to X11 through IP display.
+
 ## 3.5.0 - 2023-03-18
 
 * Enhancement - General cleanup.
