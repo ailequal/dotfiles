@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.2 - 2023-07-31
+
+* Add - Added "$HOME/.local/bin" as environment variables in macos.
+
 ## 3.5.1 - 2023-05-26
 
 * Add - Added variables for connecting to X11 through IP display.
