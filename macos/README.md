@@ -46,7 +46,7 @@ Keep in mind that some packages will all ask for root permission before installi
 
 ### settings setup
 
-* Set system settings.
+* Set system settings (keyboard key repeat: fastest; delay until repeat: shortest).
 * Set cloud accounts sync.
 * Set Finder settings.
 * Set panel setup with iStat Menus.

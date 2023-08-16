@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.3 - 2023-08-16
+
+* Add - Added keyboard specific settings in macos.
+
 ## 3.5.2 - 2023-07-31
 
 * Add - Added "$HOME/.local/bin" as environment variables in macos.
