@@ -1,10 +1,10 @@
-##############
-# bootstrap.sh
-##############
+#!/bin/bash
 
-
-#! /usr/bin/bash
 ################
+# bootstrap.sh #
+################
+
+
 
 # update os && upgrade os
 sudo apt -y update && sudo apt -y upgrade
@@ -12,7 +12,6 @@ sudo apt -y update && sudo apt -y upgrade
 # apt packages
 sudo apt -y install caffeine
 sudo apt -y install cheese
-sudo apt -y install code
 sudo apt -y install gimp
 sudo apt -y install gitg
 sudo apt -y install gnome-tweaks
@@ -44,16 +43,11 @@ sudo apt -y install wavemon
 sudo apt -y install xclip
 
 # flatpak packages
-# flatpak install flathub com.getpostman.Postman
-# flatpak install flathub com.google.Chrome
-# flatpak install flathub com.play0ad.zeroad
-# flatpak install flathub com.slack.Slack
-# flatpak install flathub com.spotify.Client
-# flatpak install flathub org.telegram.desktop
+flatpak install flathub org.DolphinEmu.dolphin-emu
 
 # snap packages
 sudo snap install 0ad
-sudo snap install 1password
+sudo snap install code --classic
 sudo snap install postman
 sudo snap install slack
 sudo snap install spotify

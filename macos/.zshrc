@@ -3,6 +3,7 @@
 ##########
 
 
+
 # import #
 ##########
 
@@ -57,7 +58,7 @@ export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
 bindkey -v
 
 # local/bin
-# export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 
 # nvm
 # export NVM_DIR="$HOME/.nvm"

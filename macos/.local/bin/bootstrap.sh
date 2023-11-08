@@ -1,10 +1,10 @@
-##############
-# bootstrap.sh
-##############
-
-
 #! /bin/bash
-############
+
+################
+# bootstrap.sh #
+################
+
+
 
 # update homebrew && upgrade homebrew
 brew update && brew upgrade
@@ -28,9 +28,7 @@ brew install --cask \
   keepingyouawake \
   keka \
   mactracker \
-  mark-text \
   monitorcontrol \
-  paw \
   postman \
   sequel-pro \
   slack \

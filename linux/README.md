@@ -31,9 +31,10 @@ sudo apt -y update && sudo apt -y upgrade
 
 Launch the bootstrap.sh script, it will automatically install lots of useful packages.
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
+You might need to install some package managers (apt, snap, flatpak) before running the script.
 
 ```shell
-chmod +x ./bootstrap.sh && ./bootstrap.sh
+chmod +x ./local/bin/bootstrap.sh && ./local/bin/bootstrap.sh
 ```
 
 ### settings setup
@@ -78,7 +79,6 @@ These extra packages must be installed manually.
 * [composer](https://getcomposer.org)
 * [devilbox](https://github.com/cytopia/devilbox)
 * [docker](https://docs.docker.com/engine/install/ubuntu)
-* [doom emacs](https://github.com/doomemacs/doomemacs)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)
 * [toolbox app](https://www.jetbrains.com/toolbox-app)

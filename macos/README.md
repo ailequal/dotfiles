@@ -37,12 +37,11 @@ First install [homebrew](https://brew.sh) package manager following the official
 
 Then you can launch the bootstrap.sh script, it will automatically install lots of useful packages.
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
+Keep in mind that some packages will all ask for root permission before installing anything on the system.
 
 ```shell
-chmod +x ./bootstrap.sh && ./bootstrap.sh
+chmod +x ./local/bin/bootstrap.sh && ./local/bin/bootstrap.sh
 ```
-
-Keep in mind that some packages will all ask for root permission before installing anything on the system.
 
 ### settings setup
 
@@ -104,7 +103,6 @@ These extra packages must be installed manually.
 
 * [composer](https://getcomposer.org)
 * [devilbox](https://github.com/cytopia/devilbox)
-* [doom emacs](https://github.com/doomemacs/doomemacs)
 * [karabiner-elements](https://karabiner-elements.pqrs.org)
 * [nvm](https://github.com/nvm-sh/nvm)
 * [phpbrew](https://github.com/phpbrew/phpbrew)

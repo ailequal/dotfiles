@@ -3,6 +3,7 @@
 ###########
 
 
+
 # import #
 ##########
 
@@ -45,10 +46,7 @@ function parse_git_branch() {
 set -o vi
 
 # local/bin
-# export PATH="$PATH:$HOME/.local/bin"
-
-# doom emacs
-# export PATH="$PATH:$HOME/.emacs.d/bin"
+export PATH="$PATH:$HOME/.local/bin"
 
 # nvm
 # export NVM_DIR="$HOME/.nvm"
