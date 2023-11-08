@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.6.0 - 2023-11-08
+
+* Add - Moved bash scripts in ".local/bin" folder.
+* Add - Other minor changes.
+
 ## 3.5.3 - 2023-08-16
 
 * Add - Added keyboard specific settings in macos.
