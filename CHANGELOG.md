@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.1 - 2023-12-28
+
+* Add - Added "gnome-shell-extensions" for Linux.
+
 ## 3.6.0 - 2023-11-08
 
 * Add - Moved bash scripts in ".local/bin" folder.

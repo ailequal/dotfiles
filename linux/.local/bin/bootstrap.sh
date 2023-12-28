@@ -14,6 +14,7 @@ sudo apt -y install caffeine
 sudo apt -y install cheese
 sudo apt -y install gimp
 sudo apt -y install gitg
+sudo apt -y install gnome-shell-extensions
 sudo apt -y install gnome-tweaks
 sudo apt -y install gpg
 sudo apt -y install handbrake
