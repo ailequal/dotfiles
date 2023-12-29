@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.2 - 2023-12-29
+
+* Update - Removed ".vscode/" from ".gitignore_global" configuration file.
+
 ## 3.6.1 - 2023-12-28
 
 * Add - Added "gnome-shell-extensions" for Linux.
