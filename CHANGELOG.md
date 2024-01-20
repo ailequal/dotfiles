@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.3 - 2024-01-20
+
+* Added global mouse support mode for tmux only on macOS.
+
 ## 3.6.2 - 2023-12-29
 
 * Update - Removed ".vscode/" from ".gitignore_global" configuration file.
