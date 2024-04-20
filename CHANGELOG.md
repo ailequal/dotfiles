@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.0 - 2024-04-20
+
+* Enhancement - Major cleanup and reorganization of the dotfiles (global setup).
+* Update - Added a few more informations for macOS and Linux.
+
 ## 3.6.3 - 2024-01-20
 
 * Added global mouse support mode for tmux only on macOS.
