@@ -66,47 +66,18 @@ inoremap <Down> <Nop>
 inoremap <Left> <Nop>
 inoremap <Right> <Nop>
 
-" set spelling languages
 :set spelllang=en,it
-
-" set number 
 :set nu
-
-" set relativenumber
 :set rnu
-
-" set textwidth=80
 :set tw=120
-
-" set ignorecase
 :set ic
-
-" set hlsearch 
 :set hls
-
-" set incsearch
 :set is
-
-" set nocompatible 
 :set nocp
-
-" set cursorcolumn
 :set cursorcolumn
-
-" set cursorline
 :set cursorline
-
-" set cursorline style
 " :highlight CursorLine guibg=lightblue ctermbg=lightgrey
-
-" set netrw list style
 let g:netrw_liststyle=1
-
-" set color scheme
 :colorscheme ron
-
-" set netrw browse split
 " let g:netrw_browse_split = 4
-
-" set netrw window size
 " let g:netrw_winsize = 20
