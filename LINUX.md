@@ -39,17 +39,17 @@ You might need to install some package managers (apt, snap, flatpak) before runn
 
 ### settings setup
 
-* Set system settings.
-* Set file manager settings.
-* Restore data from backup (optional).
-* Setup dock (minimal).
-* Install language support.
-* Set hostname.
+- Set system settings.
+- Set file manager settings.
+- Restore data from backup (optional).
+- Setup dock (minimal).
+- Install language support.
+- Set hostname.
 
 ### little fixes
 
-* Create `/home/$USER/.local/bin` folder.
-* Add "caffeine-indicator" as a startup application.
+- Create `/home/$USER/.local/bin` folder.
+- Add "caffeine-indicator" as a startup application.
 
 ### web browser logins
 
@@ -63,32 +63,32 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 
 The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications:
 
-* [firefox](https://github.com/catppuccin/firefox)
-* [gedit](https://github.com/catppuccin/gedit)
-* [gnome-terminal](https://github.com/catppuccin/gnome-terminal)
-* [jetbrains-icons](https://github.com/catppuccin/jetbrains-icons)
-* [jetbrains](https://github.com/catppuccin/jetbrains)
-* [kitty](https://github.com/catppuccin/kitty)
-* [nvim](https://github.com/catppuccin/nvim)
-* [slack](https://github.com/catppuccin/slack)
-* [spotify-player](https://github.com/catppuccin/spotify-player)
-* [tmux](https://github.com/catppuccin/tmux)
-* [vim](https://github.com/catppuccin/vim)
-* [vscode](https://github.com/catppuccin/vscode)
-* [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
+- [firefox](https://github.com/catppuccin/firefox)
+- [gedit](https://github.com/catppuccin/gedit)
+- [gnome-terminal](https://github.com/catppuccin/gnome-terminal)
+- [jetbrains-icons](https://github.com/catppuccin/jetbrains-icons)
+- [jetbrains](https://github.com/catppuccin/jetbrains)
+- [kitty](https://github.com/catppuccin/kitty)
+- [nvim](https://github.com/catppuccin/nvim)
+- [slack](https://github.com/catppuccin/slack)
+- [spotify-player](https://github.com/catppuccin/spotify-player)
+- [tmux](https://github.com/catppuccin/tmux)
+- [vim](https://github.com/catppuccin/vim)
+- [vscode](https://github.com/catppuccin/vscode)
+- [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
 
 ### terminal setup
 
 #### Native terminal
 
-* Configuration: .bashrc
-* Font: default
-* Font size: 14px
-* Color: default
-* Cursor: block & blinking
-* Tab tab: default
-* Columns: 100
-* Rows: 24
+- Configuration: .bashrc
+- Font: default
+- Font size: 14px
+- Color: default
+- Cursor: block & blinking
+- Tab tab: default
+- Columns: 100
+- Rows: 24
 
 #### kitty
 
@@ -98,16 +98,16 @@ TODO: Create the kitty configuration file.
 
 These extra packages must be installed manually.
 
-* [1password](https://1password.com)
-* [bob](https://github.com/MordechaiHadad/bob)
-* [chrome](https://www.google.com/chrome)
-* [composer](https://getcomposer.org)
-* [devilbox](https://github.com/cytopia/devilbox)
-* [docker](https://docs.docker.com/engine/install/ubuntu)
-* [kitty](https://sw.kovidgoyal.net/kitty)
-* [nvm](https://github.com/nvm-sh/nvm)
-* [toolbox app](https://www.jetbrains.com/toolbox-app)
-* [wp-cli](https://github.com/wp-cli/wp-cli)
+- [1password](https://1password.com)
+- [bob](https://github.com/MordechaiHadad/bob)
+- [chrome](https://www.google.com/chrome)
+- [composer](https://getcomposer.org)
+- [devilbox](https://github.com/cytopia/devilbox)
+- [docker](https://docs.docker.com/engine/install/ubuntu)
+- [kitty](https://sw.kovidgoyal.net/kitty)
+- [nvm](https://github.com/nvm-sh/nvm)
+- [toolbox app](https://www.jetbrains.com/toolbox-app)
+- [wp-cli](https://github.com/wp-cli/wp-cli)
 
 ### dotfiles
 

@@ -45,15 +45,15 @@ Keep in mind that some packages will all ask for root permission before installi
 
 ### settings setup
 
-* Set system settings (keyboard key repeat: fastest; delay until repeat: shortest).
-* Set cloud accounts sync.
-* Set Finder settings.
-* Set panel setup with iStat Menus.
-* Set widgets.
-* Install applications from App Store (primarly Magnet).
-* Restore data from Time Machine (optional).
-* Setup dock (minimal).
-* Set hostname.
+- Set system settings (keyboard key repeat: fastest; delay until repeat: shortest).
+- Set cloud accounts sync.
+- Set Finder settings.
+- Set panel setup with iStat Menus.
+- Set widgets.
+- Install applications from App Store (primarly Magnet).
+- Restore data from Time Machine (optional).
+- Setup dock (minimal).
+- Set hostname.
 
 ### little fixes
 
@@ -78,9 +78,10 @@ xattr -d com.apple.quarantine /Applications/Application.app
 #### spotlight
 
 Prevent Spotlight from searching into:
-* ~/repos
-* ~/sites
-* ~/Downloads/random
+
+- ~/repos
+- ~/sites
+- ~/Downloads/random
 
 ### web browser logins
 
@@ -94,32 +95,32 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 
 The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications:
 
-* [firefox](https://github.com/catppuccin/firefox)
-* [gedit](https://github.com/catppuccin/gedit)
-* [gnome-terminal](https://github.com/catppuccin/gnome-terminal)
-* [jetbrains-icons](https://github.com/catppuccin/jetbrains-icons)
-* [jetbrains](https://github.com/catppuccin/jetbrains)
-* [kitty](https://github.com/catppuccin/kitty)
-* [nvim](https://github.com/catppuccin/nvim)
-* [slack](https://github.com/catppuccin/slack)
-* [spotify-player](https://github.com/catppuccin/spotify-player)
-* [tmux](https://github.com/catppuccin/tmux)
-* [vim](https://github.com/catppuccin/vim)
-* [vscode](https://github.com/catppuccin/vscode)
-* [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
+- [firefox](https://github.com/catppuccin/firefox)
+- [gedit](https://github.com/catppuccin/gedit)
+- [gnome-terminal](https://github.com/catppuccin/gnome-terminal)
+- [jetbrains-icons](https://github.com/catppuccin/jetbrains-icons)
+- [jetbrains](https://github.com/catppuccin/jetbrains)
+- [kitty](https://github.com/catppuccin/kitty)
+- [nvim](https://github.com/catppuccin/nvim)
+- [slack](https://github.com/catppuccin/slack)
+- [spotify-player](https://github.com/catppuccin/spotify-player)
+- [tmux](https://github.com/catppuccin/tmux)
+- [vim](https://github.com/catppuccin/vim)
+- [vscode](https://github.com/catppuccin/vscode)
+- [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
 
 ### terminal setup
 
 #### Native terminal
 
-* Configuration: .zshrc
-* Font: default
-* Font size: 14px
-* Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
-* Cursor: block & blinking
-* Tab tab: always show
-* Columns: 100
-* Rows: 24
+- Configuration: .zshrc
+- Font: default
+- Font size: 14px
+- Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
+- Cursor: block & blinking
+- Tab tab: always show
+- Columns: 100
+- Rows: 24
 
 #### kitty
 
@@ -129,13 +130,13 @@ TODO: Create the kitty configuration file.
 
 These extra packages must be installed manually.
 
-* [bob](https://github.com/MordechaiHadad/bob)
-* [composer](https://getcomposer.org)
-* [devilbox](https://github.com/cytopia/devilbox)
-* [karabiner-elements](https://karabiner-elements.pqrs.org)
-* [kitty](https://sw.kovidgoyal.net/kitty)
-* [nvm](https://github.com/nvm-sh/nvm)
-* [wp-cli](https://github.com/wp-cli/wp-cli)
+- [bob](https://github.com/MordechaiHadad/bob)
+- [composer](https://getcomposer.org)
+- [devilbox](https://github.com/cytopia/devilbox)
+- [karabiner-elements](https://karabiner-elements.pqrs.org)
+- [kitty](https://sw.kovidgoyal.net/kitty)
+- [nvm](https://github.com/nvm-sh/nvm)
+- [wp-cli](https://github.com/wp-cli/wp-cli)
 
 ### dotfiles
 
