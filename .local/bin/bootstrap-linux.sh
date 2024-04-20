@@ -24,7 +24,6 @@ sudo apt -y install konsole
 sudo apt -y install lolcat
 sudo apt -y install mpv
 sudo apt -y install neofetch
-sudo apt -y install neovim
 sudo apt -y install notepadqq
 sudo apt -y install php
 sudo apt -y install pip

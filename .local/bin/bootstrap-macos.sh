@@ -51,7 +51,6 @@ brew install \
   lolcat \
   mpv \
   neofetch \
-  neovim \
   php \
   pinentry-mac \
   pngquant \

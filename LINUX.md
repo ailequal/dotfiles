@@ -75,12 +75,13 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 These extra packages must be installed manually.
 
 * [1password](https://1password.com)
+* [bob](https://github.com/MordechaiHadad/bob)
 * [chrome](https://www.google.com/chrome)
 * [composer](https://getcomposer.org)
 * [devilbox](https://github.com/cytopia/devilbox)
 * [docker](https://docs.docker.com/engine/install/ubuntu)
+* [kitty](https://sw.kovidgoyal.net/kitty)
 * [nvm](https://github.com/nvm-sh/nvm)
-* [phpbrew](https://github.com/phpbrew/phpbrew)
 * [toolbox app](https://www.jetbrains.com/toolbox-app)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
 

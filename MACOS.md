@@ -101,11 +101,12 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 
 These extra packages must be installed manually.
 
+* [bob](https://github.com/MordechaiHadad/bob)
 * [composer](https://getcomposer.org)
 * [devilbox](https://github.com/cytopia/devilbox)
 * [karabiner-elements](https://karabiner-elements.pqrs.org)
+* [kitty](https://sw.kovidgoyal.net/kitty)
 * [nvm](https://github.com/nvm-sh/nvm)
-* [phpbrew](https://github.com/phpbrew/phpbrew)
 * [wp-cli](https://github.com/wp-cli/wp-cli)
 
 ### dotfiles
