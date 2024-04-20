@@ -8,7 +8,7 @@ This little guide is my reference when I am setting up a new machine with GNU/Li
 
 1. [install linux](#install-linux)
 2. [update everything](#update-everything)
-3. [bootstrap.sh](#bootstrapsh)
+3. [bootstrap-linux.sh](#bootstrap-linuxsh)
 4. [settings setup](#settings-setup)
 5. [little fixes](#little-fixes)
 6. [web browser logins](#web-browser-logins)
@@ -27,14 +27,14 @@ Download your distro of choice and install it on your machine (I'll use a Debian
 sudo apt -y update && sudo apt -y upgrade
 ```
 
-### bootstrap.sh
+### bootstrap-linux.sh
 
-Launch the bootstrap.sh script, it will automatically install lots of useful packages.
+Launch the bootstrap-linux.sh script, it will automatically install lots of useful packages.
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
 You might need to install some package managers (apt, snap, flatpak) before running the script.
 
 ```shell
-chmod +x ./local/bin/bootstrap.sh && ./local/bin/bootstrap.sh
+./local/bin/bootstrap-linux.sh
 ```
 
 ### settings setup
@@ -48,8 +48,8 @@ chmod +x ./local/bin/bootstrap.sh && ./local/bin/bootstrap.sh
 
 ### little fixes
 
+* Create `/home/$USER/.local/bin` folder.
 * Add "caffeine-indicator" as a startup application.
-* Create "/home/$USER/.local/bin" folder.
 
 ### web browser logins
 
@@ -59,7 +59,27 @@ Open up your browser and start logging inside your main websites.
 
 Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9ffcf) and [gpg](https://gist.github.com/ailequal/fc9b12cb35f119dcdc1a2f4406bf8b54) keys correctly and test them.
 
+### theme
+
+The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications:
+
+* [firefox](https://github.com/catppuccin/firefox)
+* [gedit](https://github.com/catppuccin/gedit)
+* [gnome-terminal](https://github.com/catppuccin/gnome-terminal)
+* [jetbrains-icons](https://github.com/catppuccin/jetbrains-icons)
+* [jetbrains](https://github.com/catppuccin/jetbrains)
+* [kitty](https://github.com/catppuccin/kitty)
+* [nvim](https://github.com/catppuccin/nvim)
+* [slack](https://github.com/catppuccin/slack)
+* [spotify-player](https://github.com/catppuccin/spotify-player)
+* [tmux](https://github.com/catppuccin/tmux)
+* [vim](https://github.com/catppuccin/vim)
+* [vscode](https://github.com/catppuccin/vscode)
+* [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
+
 ### terminal setup
+
+#### Native terminal
 
 * Configuration: .bashrc
 * Font: default
@@ -69,6 +89,10 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 * Tab tab: default
 * Columns: 100
 * Rows: 24
+
+#### kitty
+
+TODO: Create the kitty configuration file.
 
 ### extra packages
 
@@ -87,4 +111,4 @@ These extra packages must be installed manually.
 
 ### dotfiles
 
-Add the dotfiles to your system.
+Add the dotfiles to your system (beware that there are a few ones only for macOS).
