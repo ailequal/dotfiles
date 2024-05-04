@@ -44,13 +44,13 @@ brew install --cask \
 
 # formulae
 brew install \
+  fastfetch \
   ffmpeg \
   git \
   gnupg \
   htop \
   lolcat \
   mpv \
-  neofetch \
   php \
   pinentry-mac \
   pngquant \

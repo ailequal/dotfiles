@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.1 - 2024-05-04
+
+* Enhancement - Replaced neofetch with fastfetch for macOS.
+* Enhancement - Disabled vi keybindings in the terminal.
+
 ## 4.0.0 - 2024-04-20
 
 * Enhancement - Major cleanup and reorganization of the dotfiles (global setup).

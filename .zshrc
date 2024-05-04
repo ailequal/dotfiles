@@ -55,7 +55,7 @@ export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
 #########################
 
 # vi keybindings
-bindkey -v
+# bindkey -v
 
 # local/bin
 export PATH="$PATH:$HOME/.local/bin"

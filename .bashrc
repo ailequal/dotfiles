@@ -43,7 +43,7 @@ function parse_git_branch() {
 #########################
 
 # vi keybindings
-set -o vi
+# set -o vi
 
 # local/bin
 export PATH="$PATH:$HOME/.local/bin"
