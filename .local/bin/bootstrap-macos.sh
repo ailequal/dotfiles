@@ -57,6 +57,7 @@ brew install \
   speedtest-cli \
   tig \
   tmux \
+  tokei \
   tree \
   yt-dlp \
   vim
