@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.2 - 2024-06-11
+
+* Enhancement - Updated .bashrc and minor stuff.
+
 ## 4.0.1 - 2024-05-04
 
 * Enhancement - Replaced neofetch with fastfetch for macOS.
