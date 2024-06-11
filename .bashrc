@@ -45,6 +45,9 @@ function parse_git_branch() {
 # vi keybindings
 # set -o vi
 
+# tab title inside gnome terminal
+PROMPT_COMMAND='echo -ne "\033]0;$(tty)\007"'
+
 # local/bin
 export PATH="$PATH:$HOME/.local/bin"
 
