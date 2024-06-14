@@ -49,6 +49,7 @@ brew install \
   git \
   gnupg \
   htop \
+  lazydocker \
   lolcat \
   mpv \
   php \

@@ -105,6 +105,7 @@ These extra packages must be installed manually.
 - [devilbox](https://github.com/cytopia/devilbox)
 - [docker](https://docs.docker.com/engine/install/ubuntu)
 - [kitty](https://sw.kovidgoyal.net/kitty)
+- [lazydocker](https://github.com/jesseduffield/lazydocker)
 - [nvm](https://github.com/nvm-sh/nvm)
 - [toolbox app](https://www.jetbrains.com/toolbox-app)
 - [wp-cli](https://github.com/wp-cli/wp-cli)
