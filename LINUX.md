@@ -113,3 +113,13 @@ These extra packages must be installed manually.
 ### dotfiles
 
 Add the dotfiles to your system (beware that there are a few ones only for macOS).
+
+#### git
+
+```bash
+# set global gitignore file
+git config --global core.excludesfile ~/.config/git/ignore
+
+# check global gitignore file
+git config --global core.excludesfile
+```

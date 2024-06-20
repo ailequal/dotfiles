@@ -113,6 +113,8 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 
 #### Native terminal
 
+Set the terminal profile `~/.config/com.apple.Terminal/midnight.terminal` as default.
+
 - Configuration: .zshrc
 - Font: default
 - Font size: 14px
@@ -141,3 +143,13 @@ These extra packages must be installed manually.
 ### dotfiles
 
 Add the dotfiles to your system (beware that there are a few ones only for Linux).
+
+#### git
+
+```bash
+# set global gitignore file
+git config --global core.excludesfile ~/.config/git/ignore
+
+# check global gitignore file
+git config --global core.excludesfile
+```
