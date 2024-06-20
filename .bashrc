@@ -42,14 +42,14 @@ function parse_git_branch() {
 # environment variables #
 #########################
 
+# local/bin
+export PATH="$PATH:$HOME/.local/bin"
+
 # vi keybindings
 # set -o vi
 
 # tab title inside gnome terminal
 PROMPT_COMMAND='echo -ne "\033]0;$(tty)\007"'
-
-# local/bin
-export PATH="$PATH:$HOME/.local/bin"
 
 # nvm
 # export NVM_DIR="$HOME/.nvm"

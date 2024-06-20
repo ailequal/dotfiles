@@ -54,11 +54,11 @@ export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
 # environment variables #
 #########################
 
-# vi keybindings
-# bindkey -v
-
 # local/bin
 export PATH="$PATH:$HOME/.local/bin"
+
+# vi keybindings
+# bindkey -v
 
 # nvm
 # export NVM_DIR="$HOME/.nvm"
