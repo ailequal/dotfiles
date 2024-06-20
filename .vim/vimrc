@@ -66,7 +66,7 @@ inoremap <Down> <Nop>
 inoremap <Left> <Nop>
 inoremap <Right> <Nop>
 
-:set spelllang=en,it
+" :set spelllang=en,it
 :set nu
 :set rnu
 :set tw=120
@@ -74,10 +74,10 @@ inoremap <Right> <Nop>
 :set hls
 :set is
 :set nocp
-:set cursorcolumn
-:set cursorline
+" :set cursorcolumn
+" :set cursorline
 " :highlight CursorLine guibg=lightblue ctermbg=lightgrey
 let g:netrw_liststyle=1
-:colorscheme ron
+" :colorscheme ron
 " let g:netrw_browse_split = 4
 " let g:netrw_winsize = 20
