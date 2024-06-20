@@ -44,6 +44,7 @@ brew install --cask \
 
 # formulae
 brew install \
+  bat \
   fastfetch \
   ffmpeg \
   git \
@@ -52,13 +53,19 @@ brew install \
   lazydocker \
   lolcat \
   mpv \
+  openssl \
   php \
   pinentry-mac \
   pngquant \
+  ripgrep \
   speedtest-cli \
   tig \
   tmux \
   tokei \
   tree \
   yt-dlp \
-  vim
+  vim \
+  zellij
+
+# cargo
+cargo install bob-nvim

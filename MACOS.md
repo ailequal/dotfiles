@@ -33,9 +33,12 @@ xcode-select --install
 
 ### bootstrap-macos.sh
 
-First install [homebrew](https://brew.sh) package manager following the official guide.
+First install these package managers (or some of them) following the official guides:
 
-Then you can launch the bootstrap-macos.sh script, it will automatically install lots of useful packages.
+- [cargo](https://www.rust-lang.org/tools/install)
+- [homebrew](https://brew.sh)
+
+Then you can launch the `bootstrap-macos.sh` script, it will automatically install lots of useful packages.
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
 Keep in mind that some packages will all ask for root permission before installing anything on the system.
 
@@ -57,31 +60,20 @@ Keep in mind that some packages will all ask for root permission before installi
 
 ### little fixes
 
-#### local/bin
+```shell
+mkdir -p ~/.local/bin
 
-Create `/Users/$USER/.local/bin` folder.
-
-#### unsigned applications
-
-Enable unsigned applications.
-
-```bash
+# enable unsigned applications
 sudo spctl --master-disable
-```
 
-Enable a specific unsigned application.
-
-```bash
+# enable a specific unsigned application
 xattr -d com.apple.quarantine /Applications/Application.app
+
+# manually prevent spotlight from searching into
+# ~/repos
+# ~/sites
+# ~/Downloads/random
 ```
-
-#### spotlight
-
-Prevent Spotlight from searching into:
-
-- ~/repos
-- ~/sites
-- ~/Downloads/random
 
 ### web browser logins
 
@@ -93,7 +85,7 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 
 ### theme
 
-The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications:
+The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications, if installed (some of them are automatically configured in the dotfiles):
 
 - [firefox](https://github.com/catppuccin/firefox)
 - [gedit](https://github.com/catppuccin/gedit)
@@ -108,10 +100,11 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 - [vim](https://github.com/catppuccin/vim)
 - [vscode](https://github.com/catppuccin/vscode)
 - [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
+- [zellij](https://github.com/catppuccin/zellij)
 
 ### terminal setup
 
-#### Native terminal
+#### macOS Terminal
 
 Set the terminal profile `~/.config/com.apple.Terminal/midnight.terminal` as default.
 
@@ -132,7 +125,6 @@ TODO: Create the kitty configuration file.
 
 These extra packages must be installed manually.
 
-- [bob](https://github.com/MordechaiHadad/bob)
 - [composer](https://getcomposer.org)
 - [devilbox](https://github.com/cytopia/devilbox)
 - [karabiner-elements](https://karabiner-elements.pqrs.org)
@@ -146,7 +138,7 @@ Add the dotfiles to your system (beware that there are a few ones only for Linux
 
 #### git
 
-```bash
+```shell
 # set global gitignore file
 git config --global core.excludesfile ~/.config/git/ignore
 

@@ -23,15 +23,22 @@ Download your distro of choice and install it on your machine (I'll use a Debian
 
 ### update everything
 
+Turn off automatic updates and run these commands in the terminal.
+
 ```shell
-sudo apt -y update && sudo apt -y upgrade
+sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove
 ```
 
 ### bootstrap-linux.sh
 
-Launch the bootstrap-linux.sh script, it will automatically install lots of useful packages.
+First install these package managers (or some of them) following the official guides:
+
+- [cargo](https://www.rust-lang.org/tools/install)
+- [snap](https://snapcraft.io/docs/installing-snap-on-ubuntu)
+- [flatpak](https://flatpak.org/setup/Ubuntu)
+
+Then you can launch the `bootstrap-linux.sh` script, it will automatically install lots of useful packages.
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
-You might need to install some package managers (apt, snap, flatpak) before running the script.
 
 ```shell
 ./local/bin/bootstrap-linux.sh
@@ -48,8 +55,11 @@ You might need to install some package managers (apt, snap, flatpak) before runn
 
 ### little fixes
 
-- Create `/home/$USER/.local/bin` folder.
-- Add "caffeine-indicator" as a startup application.
+```shell
+mkdir -p ~/.local/bin
+
+# manually add caffeine-indicator as a startup application.
+```
 
 ### web browser logins
 
@@ -61,7 +71,7 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 
 ### theme
 
-The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications:
+The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications, if installed (some of them are automatically configured in the dotfiles):
 
 - [firefox](https://github.com/catppuccin/firefox)
 - [gedit](https://github.com/catppuccin/gedit)
@@ -76,15 +86,16 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 - [vim](https://github.com/catppuccin/vim)
 - [vscode](https://github.com/catppuccin/vscode)
 - [xfce4-terminal](https://github.com/catppuccin/xfce4-terminal)
+- [zellij](https://github.com/catppuccin/zellij)
 
 ### terminal setup
 
-#### Native terminal
+#### Gnome terminal
 
 - Configuration: .bashrc
 - Font: default
 - Font size: 14px
-- Color: default
+- Color: Catppuccin-Macchiato
 - Cursor: block & blinking
 - Tab tab: default
 - Columns: 100
@@ -99,7 +110,6 @@ TODO: Create the kitty configuration file.
 These extra packages must be installed manually.
 
 - [1password](https://1password.com)
-- [bob](https://github.com/MordechaiHadad/bob)
 - [chrome](https://www.google.com/chrome)
 - [composer](https://getcomposer.org)
 - [devilbox](https://github.com/cytopia/devilbox)
@@ -116,7 +126,7 @@ Add the dotfiles to your system (beware that there are a few ones only for macOS
 
 #### git
 
-```bash
+```shell
 # set global gitignore file
 git config --global core.excludesfile ~/.config/git/ignore
 

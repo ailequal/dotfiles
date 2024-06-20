@@ -45,6 +45,9 @@ function parse_git_branch() {
 # local/bin
 export PATH="$PATH:$HOME/.local/bin"
 
+# bob-nvim
+export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+
 # vi keybindings
 # set -o vi
 
