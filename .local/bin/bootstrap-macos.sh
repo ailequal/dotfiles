@@ -11,6 +11,7 @@ brew update && brew upgrade
 
 # casks
 brew install --cask 1password
+# brew install --cask alacritty
 brew install --cask appcleaner
 brew install --cask coconutbattery
 brew install --cask cyberduck
@@ -22,14 +23,14 @@ brew install --cask google-backup-and-sync
 brew install --cask google-chrome
 brew install --cask handbrake
 brew install --cask istat-menus
-brew install --cask iterm2
+# brew install --cask iterm2
 brew install --cask jetbrains-toolbox
 brew install --cask keepingyouawake
 brew install --cask keka
 brew install --cask mactracker
-brew install --cask monitorcontrol
+# brew install --cask monitorcontrol
 brew install --cask postman
-brew install --cask sequel-pro
+# brew install --cask sequel-pro
 brew install --cask slack
 brew install --cask spotify
 brew install --cask sublime-text
