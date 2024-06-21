@@ -13,6 +13,7 @@ sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove
 sudo apt -y install bat
 sudo apt -y install caffeine
 sudo apt -y install cheese
+sudo apt -y install ffmpeg
 sudo apt -y install gimp
 sudo apt -y install gitg
 sudo apt -y install gnome-shell-extensions
@@ -38,9 +39,9 @@ sudo apt -y install thunar
 sudo apt -y install tig
 sudo apt -y install tmux
 sudo apt -y install tree
-sudo apt -y install vagrant
+# sudo apt -y install vagrant
 sudo apt -y install vim
-sudo apt -y install virtualbox
+# sudo apt -y install virtualbox
 sudo apt -y install vlc
 sudo apt -y install wavemon
 sudo apt -y install xclip

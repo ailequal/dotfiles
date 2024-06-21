@@ -10,6 +10,10 @@
 # ls
 # alias ls='ls --color=auto'
 
+# python
+alias python=python3
+alias pip=pip3
+
 # youtube
 alias youtube-dl="yt-dlp"
 alias yt-dl-music="youtube-dl -f bestaudio -x --audio-format m4a $1"
