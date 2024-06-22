@@ -103,6 +103,24 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 
 #### kitty
 
+Install [Kitty](https://sw.kovidgoyal.net/kitty/binary/#install-kitty) and then run
+`sudo ln -s ~/.local/kitty.app/bin/kitty /usr/local/bin/kitty`. From now on, from Gnome with `alt + f2` you can run `kitty` and it will open the terminal.
+
+```shell
+# These commands should set kitty as the default terminal emulator in gnome,
+# but it doesn't work as expected yet.
+# https://github.com/kovidgoyal/kitty/issues/1101
+
+# add kitty as an alternative to x-terminal-emulator
+sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator `which kitty` 50
+
+# set the default terminal emulator
+sudo update-alternatives --config x-terminal-emulator
+
+# remove kitty as an alternative to x-terminal-emulator (if needed)
+sudo update-alternatives --remove x-terminal-emulator /usr/local/bin/kitty
+```
+
 TODO: Create the kitty configuration file.
 
 ### extra packages
