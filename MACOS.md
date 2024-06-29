@@ -121,8 +121,6 @@ Set the terminal profile `~/.config/com.apple.Terminal/midnight.terminal` as def
 
 Install [Kitty](https://sw.kovidgoyal.net/kitty/binary/#install-kitty) and optionally set a global shortcut for it with `skhd` following [this guide](https://www.paolomainardi.com/posts/macos-apps-shortcuts-skhd).
 
-TODO: Create the kitty configuration file.
-
 ### extra packages
 
 These extra packages must be installed manually.
@@ -137,3 +135,4 @@ These extra packages must be installed manually.
 ### dotfiles
 
 Add the dotfiles to your system (beware that there are a few ones only for Linux).
+This includes mainly includes `.config/*` and `.local/bin/*`, plus a few other files.

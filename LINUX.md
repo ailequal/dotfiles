@@ -121,8 +121,6 @@ sudo update-alternatives --config x-terminal-emulator
 sudo update-alternatives --remove x-terminal-emulator /usr/local/bin/kitty
 ```
 
-TODO: Create the kitty configuration file.
-
 ### extra packages
 
 These extra packages must be installed manually.
@@ -141,3 +139,4 @@ These extra packages must be installed manually.
 ### dotfiles
 
 Add the dotfiles to your system (beware that there are a few ones only for macOS).
+This includes mainly includes `.config/*` and `.local/bin/*`, plus a few other files.
