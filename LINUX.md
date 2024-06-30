@@ -73,6 +73,7 @@ Set up your [ssh](https://gist.github.com/ailequal/b74811385f4047b34ad590d138c9f
 
 The main color scheme theme is [catppuccin](https://github.com/catppuccin) in the variant `Catppuccin-Macchiato`. Apply it to these main applications, if installed (some of them are automatically configured in the dotfiles):
 
+- [alacritty](https://github.com/catppuccin/alacritty)
 - [firefox](https://github.com/catppuccin/firefox)
 - [gedit](https://github.com/catppuccin/gedit)
 - [gnome-terminal](https://github.com/catppuccin/gnome-terminal)
@@ -100,6 +101,10 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 - Tab tab: default
 - Columns: 100
 - Rows: 24
+
+#### alacritty
+
+Install [Alacritty](https://github.com/alacritty/alacritty/blob/master/INSTALL.md) and have fun!!
 
 #### kitty
 

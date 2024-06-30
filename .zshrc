@@ -57,13 +57,17 @@ export LSCOLORS=GxFxCxDxBxegedabagaced # dark theme
 # local/bin
 export PATH="$PATH:$HOME/.local/bin"
 
+# cli editor
+export EDITOR="nvim"
+export SUDO_EDITOR="nvim"
+
 # vi keybindings
 # bindkey -v
 
-# nvm
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# tab title as current tty
+precmd() {
+  echo -ne "\033]0;$(tty)\007"
+}
 
 # connect to X11 through IP display
 export IP=$(ipconfig getifaddr en0)

@@ -48,13 +48,12 @@ export PATH="$PATH:$HOME/.local/bin"
 # bob-nvim
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 
+# cli editor
+export EDITOR="nvim"
+export SUDO_EDITOR="nvim"
+
 # vi keybindings
 # set -o vi
 
-# tab title inside gnome terminal
+# tab title as current tty
 PROMPT_COMMAND='echo -ne "\033]0;$(tty)\007"'
-
-# nvm
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
