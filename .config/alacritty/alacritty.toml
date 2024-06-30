@@ -21,8 +21,8 @@ shape = "Block"
 blinking = "Always"
 
 [window]
-padding.x = 16
-padding.y = 14
+# padding.x = 16
+# padding.y = 14
 decorations = "Full"
 opacity = 1
 
