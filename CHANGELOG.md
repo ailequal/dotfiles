@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.0 - 2024-06-30
+
+* Enhancement - Lots of good stuff and cleanup.
+
 ## 4.0.2 - 2024-06-11
 
 * Enhancement - Updated .bashrc and minor stuff.
