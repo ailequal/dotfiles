@@ -11,7 +11,7 @@ brew update && brew upgrade
 
 # casks
 brew install --cask 1password
-# brew install --cask alacritty
+brew install --cask alacritty
 brew install --cask appcleaner
 brew install --cask coconutbattery
 brew install --cask cyberduck

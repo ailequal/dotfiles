@@ -54,7 +54,7 @@ sudo apt -y install wavemon
 sudo apt -y install xclip
 
 # cargo
-# cargo install alacritty
+cargo install alacritty
 cargo install bob-nvim
 cargo install --locked zellij
 

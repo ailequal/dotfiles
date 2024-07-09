@@ -69,7 +69,7 @@ sudo spctl --master-disable
 # enable a specific unsigned application
 xattr -d com.apple.quarantine /Applications/Application.app
 
-# manually prevent spotlight from searching into
+# manually prevent spotlight from searching into:
 # ~/repos
 # ~/sites
 # ~/Downloads/random
@@ -109,22 +109,23 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 
 Set the terminal profile `~/.config/com.apple.Terminal/midnight.terminal` as default.
 
-- Configuration: .zshrc
-- Font: default
-- Font size: 14px
-- Color: [Midnight In Mojave](https://github.com/mbadolato/iTerm2-Color-Schemes)
-- Cursor: block & blinking
-- Tab tab: always show
-- Columns: 100
-- Rows: 24
-
 #### alacritty
 
-Install [Alacritty](https://github.com/alacritty/alacritty/blob/master/INSTALL.md) and have fun!!
+Install [Alacritty](https://github.com/alacritty/alacritty/blob/master/INSTALL.md).
 
 #### kitty
 
-Install [Kitty](https://sw.kovidgoyal.net/kitty/binary/#install-kitty) and optionally set a global shortcut for it with `skhd` following [this guide](https://www.paolomainardi.com/posts/macos-apps-shortcuts-skhd).
+Install [Kitty](https://sw.kovidgoyal.net/kitty/binary/#install-kitty).
+
+#### links
+
+```shell
+# create a symbolic link (it will only work for the current user though)
+sudo ln -s ~/.cargo/bin/alacritty /usr/local/bin/alacritty
+sudo ln -s ~/.local/kitty.app/bin/kitty /usr/local/bin/kitty
+```
+
+Optionally set a global shortcut for them with `skhd` following [this guide](https://www.paolomainardi.com/posts/macos-apps-shortcuts-skhd).
 
 ### extra packages
 

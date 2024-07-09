@@ -25,10 +25,6 @@ Download your distro of choice and install it on your machine (I'll use a Debian
 
 Turn off automatic updates and run these commands in the terminal.
 
-```shell
-sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove
-```
-
 ### bootstrap-linux.sh
 
 First install these package managers (or some of them) following the official guides:
@@ -93,38 +89,25 @@ The main color scheme theme is [catppuccin](https://github.com/catppuccin) in th
 
 #### Gnome terminal
 
-- Configuration: .bashrc
-- Font: default
-- Font size: 14px
-- Color: Catppuccin-Macchiato
-- Cursor: block & blinking
-- Tab tab: default
-- Columns: 100
-- Rows: 24
+Set the terminal profile `Catppuccin-Macchiato` as default.
 
 #### alacritty
 
-Install [Alacritty](https://github.com/alacritty/alacritty/blob/master/INSTALL.md) and have fun!!
+Install [Alacritty](https://github.com/alacritty/alacritty/blob/master/INSTALL.md).
 
 #### kitty
 
-Install [Kitty](https://sw.kovidgoyal.net/kitty/binary/#install-kitty) and then run
-`sudo ln -s ~/.local/kitty.app/bin/kitty /usr/local/bin/kitty`. From now on, from Gnome with `alt + f2` you can run `kitty` and it will open the terminal.
+Install [Kitty](https://sw.kovidgoyal.net/kitty/binary/#install-kitty).
+
+#### links
 
 ```shell
-# These commands should set kitty as the default terminal emulator in gnome,
-# but it doesn't work as expected yet.
-# https://github.com/kovidgoyal/kitty/issues/1101
-
-# add kitty as an alternative to x-terminal-emulator
-sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator `which kitty` 50
-
-# set the default terminal emulator
-sudo update-alternatives --config x-terminal-emulator
-
-# remove kitty as an alternative to x-terminal-emulator (if needed)
-sudo update-alternatives --remove x-terminal-emulator /usr/local/bin/kitty
+# create a symbolic link (it will only work for the current user though)
+sudo ln -s ~/.cargo/bin/alacritty /usr/local/bin/alacritty
+sudo ln -s ~/.local/kitty.app/bin/kitty /usr/local/bin/kitty
 ```
+
+From now on, from Gnome, with `alt + f2` you can run `alacritty` or `kitty`.
 
 ### extra packages
 
