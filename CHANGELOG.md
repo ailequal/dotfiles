@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.1 - 2024-07-09
+
+* Enhancement - Updated terminals info.
+
 ## 4.1.0 - 2024-06-30
 
 * Enhancement - Lots of good stuff and cleanup.
