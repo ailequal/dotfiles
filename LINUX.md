@@ -118,6 +118,7 @@ These extra packages must be installed manually.
 - [composer](https://getcomposer.org)
 - [devilbox](https://github.com/cytopia/devilbox)
 - [docker](https://docs.docker.com/engine/install/ubuntu)
+- [jetbrains-mono](https://github.com/JetBrains/JetBrainsMono)
 - [kitty](https://sw.kovidgoyal.net/kitty)
 - [lazydocker](https://github.com/jesseduffield/lazydocker)
 - [lazygit](https://github.com/jesseduffield/lazygit)

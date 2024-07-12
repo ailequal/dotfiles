@@ -5,6 +5,9 @@ TERM = "xterm-256color"
 
 [font]
 size = 18
+normal = { family = "JetBrainsMono Nerd Font Mono", style = "Regular" }
+bold = { family = "JetBrainsMono Nerd Font Mono", style = "Bold" }
+italic = { family = "JetBrainsMono Nerd Font Mono", style = "Italic" }
 
 [window.dimensions]
 columns = 100

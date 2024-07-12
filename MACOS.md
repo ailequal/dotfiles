@@ -133,6 +133,7 @@ These extra packages must be installed manually.
 
 - [composer](https://getcomposer.org)
 - [devilbox](https://github.com/cytopia/devilbox)
+- [jetbrains-mono](https://github.com/JetBrains/JetBrainsMono)
 - [karabiner-elements](https://karabiner-elements.pqrs.org)
 - [kitty](https://sw.kovidgoyal.net/kitty)
 - [nvm](https://github.com/nvm-sh/nvm)
