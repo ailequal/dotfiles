@@ -14,6 +14,7 @@ columns = 100
 lines = 28
 
 # [shell]
+# program = "/bin/zsh"
 # program = "zellij"
 
 [cursor]
@@ -33,3 +34,6 @@ opacity = 1
 bindings = [
 { key = "F11", action = "ToggleFullscreen" }
 ]
+
+[selection]
+save_to_clipboard = true
