@@ -44,6 +44,7 @@ brew install --cask vlc
 
 # formulae
 brew install bat
+brew install dua-cli
 brew install fastfetch
 brew install ffmpeg
 brew install git
