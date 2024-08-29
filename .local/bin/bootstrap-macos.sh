@@ -53,6 +53,7 @@ brew install htop
 brew install lazydocker
 brew install lazygit
 brew install lolcat
+brew install mactop
 brew install mpv
 brew install openssl
 brew install php
