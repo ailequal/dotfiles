@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# list all files modified across an entire branch
+#   git-files-branch dev  --> list files modified between 'dev' and current branch
+#   git-files-branch main --> list files modified between 'main' and current branch
+git-files-branch() {
+  # check if the user provided a base branch
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a base branch (e.g., dev, main)."
+    echo "Usage: git-files-branch <base_branch>"
+    return 1
+  fi
+
+  local base_branch="$1"
+
+  # --name-only: shows only the file names
+  # --diff-filter=d: ignores deleted files
+  # "$base_branch"...HEAD: compares the point of divergence to your current state
+  git diff --name-only --diff-filter=d "$base_branch"...HEAD
+}
+
+git-files-branch "$@"

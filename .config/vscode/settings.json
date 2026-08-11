@@ -1,0 +1,145 @@
+{
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
+  },
+  "[php]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "breadcrumbs.enabled": true,
+  "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, TabWidth: 4, UseTab: Never, ColumnLimit: 120 }",
+  "chat.agent.enabled": true,
+  "chat.agentFilesLocations": {
+    "~/.copilot/agents": true
+  },
+  "chat.fontSize": 14,
+  "chat.mcp.autostart": "never",
+  "chat.useAgentSkills": true,
+  "chat.useNestedAgentsMdFiles": false,
+  "chat.viewSessions.orientation": "stacked",
+  "diffEditor.renderSideBySide": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.cursorStyle": "line",
+  "editor.detectIndentation": true,
+  "editor.fontFamily": "'JetBrainsMono Nerd Font Mono', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 18,
+  "editor.guides.bracketPairs": "active",
+  "editor.hover.enabled": "on",
+  "editor.inlineSuggest.enabled": true,
+  "editor.insertSpaces": true,
+  "editor.minimap.enabled": false,
+  "editor.mouseWheelScrollSensitivity": 0.8,
+  "editor.mouseWheelZoom": false,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "editor.renderControlCharacters": false,
+  "editor.renderWhitespace": "all",
+  "editor.rulers": [80],
+  "editor.scrollBeyondLastLine": false,
+  "editor.tabSize": 2,
+  "editor.wordWrap": "off",
+  "emmet.triggerExpansionOnTab": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.cts": "${capture}.typegen.ts",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.jsx": "${capture}.js",
+    "*.mts": "${capture}.typegen.ts",
+    "*.ts": "${capture}.js, ${capture}.typegen.ts",
+    "*.tsx": "${capture}.ts, ${capture}.typegen.ts",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml",
+    "tsconfig.json": "tsconfig.*.json"
+  },
+  "extensions.autoCheckUpdates": false,
+  "extensions.autoUpdate": "off",
+  "extensions.ignoreRecommendations": true,
+  "files.associations": {
+    "*.css": "tailwindcss"
+    // "*.scss": "tailwindcss"
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.env": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/vendor": true
+  },
+  "git.blame.editorDecoration.enabled": false,
+  "git.openRepositoryInParentFolders": "never",
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "plaintext": false,
+    "scminput": false,
+    "yaml": false
+  },
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
+  "jupyter.notebookFileRoot": "${folderPath}",
+  "prettier.semi": true,
+  "python.analysis.typeCheckingMode": "standard",
+  "remote.defaultExtensionsIfInstalledLocally": [
+    "catppuccin.catppuccin-vsc-pack",
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "GitHub.vscode-pull-request-github"
+  ],
+  "security.workspace.trust.enabled": false,
+  "tailwindCSS.emmetCompletions": false,
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
+  },
+  "telemetry.telemetryLevel": "off",
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.cursorStyle": "block",
+  "terminal.integrated.env.linux": {},
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono', Menlo, Monaco, 'Courier New', monospace",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.suggest.enabled": false,
+  "update.mode": "manual",
+  "window.newWindowProfile": "ailequal",
+  "workbench.activityBar.location": "top",
+  "workbench.colorTheme": "Catppuccin Macchiato",
+  "workbench.iconTheme": "catppuccin-macchiato",
+  "workbench.startupEditor": "none"
+}

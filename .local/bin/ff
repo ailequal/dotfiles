@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+# find files by name, using the exact same defaults as ripgrep (rg)
+# the pattern is a regex matched against the file path, and the files considered
+# are the ones rg would search: .gitignore and .ignore rules are respected,
+# hidden files and symlinked directories are skipped, matching is case sensitive
+#   ff config                --> list files whose path matches 'config'
+#   ff '\.env$'              --> regex: only paths ending in .env
+#   ff '^src/.*\.ts$'        --> regex: typescript files under src/
+#   ff readme docs src       --> search only inside docs/ and src/
+#   ff -i readme             --> case insensitive, like rg -i
+#   ff -F 'file[1].txt'      --> literal match, no regex, like rg -F
+#   ff -v test               --> invert: paths NOT matching 'test'
+#   ff --hidden dotfile      --> include hidden files, like rg --hidden
+#   ff --no-ignore build     --> ignore .gitignore rules, like rg --no-ignore
+#   ff -g '*.md' readme      --> only look at markdown files, like rg -g
+#   ff -t py main            --> only look at python files, like rg -t
+#   ff -- -dashed            --> everything after -- is a pattern, not an option
+ff() {
+  # check if the user provided a search pattern
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a search pattern."
+    echo "Usage: ff [options] <pattern> [path...]"
+    return 1
+  fi
+
+  if ! command -v rg > /dev/null; then
+    echo "Error: 'rg' is not installed. Install it first (e.g., brew install ripgrep, sudo apt install ripgrep)."
+    return 1
+  fi
+
+  # the work is split across two rg calls: the first one lists the candidate
+  # files, the second one matches the pattern against those paths. each option
+  # is routed to the call it belongs to, so it keeps its usual rg meaning
+  local list_opts=()  # options deciding WHICH files are walked
+  local match_opts=() # options deciding HOW the pattern matches
+  local pattern=""
+  local paths=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      # matching behavior, forwarded to the second rg
+      -i|--ignore-case|-s|--case-sensitive|-S|--smart-case|-F|--fixed-strings|-v|--invert-match|-w|--word-regexp|-x|--line-regexp|-P|--pcre2)
+        match_opts+=("$1")
+        ;;
+      # file walking behavior, forwarded to the first rg
+      -.|--hidden|--no-ignore|--no-ignore-vcs|-L|--follow|-u|-uu|-uuu)
+        list_opts+=("$1")
+        ;;
+      # same as above, but these options consume the value that follows them
+      -d|--max-depth|-t|--type|-T|--type-not|-g|--glob|--iglob)
+        if [ -z "$2" ]; then
+          echo "Error: option '$1' requires a value."
+          return 1
+        fi
+        list_opts+=("$1" "$2")
+        shift
+        ;;
+      # everything after -- is a pattern or a path, never an option
+      --)
+        shift
+        break
+        ;;
+      -*)
+        echo "Error: unknown option '$1'."
+        echo "Usage: ff [options] <pattern> [path...]"
+        return 1
+        ;;
+      # the first bare argument is the pattern, every other one is a path
+      *)
+        if [ -z "$pattern" ]; then
+          pattern="$1"
+        else
+          paths+=("$1")
+        fi
+        ;;
+    esac
+    shift
+  done
+
+  # collect whatever followed a literal '--' separator
+  while [ $# -gt 0 ]; do
+    if [ -z "$pattern" ]; then
+      pattern="$1"
+    else
+      paths+=("$1")
+    fi
+    shift
+  done
+
+  # a pattern is still required when only options were provided
+  if [ -z "$pattern" ]; then
+    echo "Error: you must provide a search pattern."
+    echo "Usage: ff [options] <pattern> [path...]"
+    return 1
+  fi
+
+  # --files lists every file rg would search, honoring all of its ignore rules,
+  # then the second rg filters that list. casing, regex syntax and colored
+  # output are therefore identical to a plain rg invocation
+  rg --files "${list_opts[@]}" "${paths[@]}" | rg "${match_opts[@]}" -- "$pattern"
+
+  # keep rg exit codes intact (0 match, 1 no match, 2 error)
+  # a pipeline only reports its last command, so the statuses of both rg calls
+  # are captured at once and the error of the first one, if any, wins
+  local statuses=("${PIPESTATUS[@]}")
+  if [ "${statuses[0]}" -gt 1 ]; then
+    return "${statuses[0]}"
+  fi
+
+  return "${statuses[1]}"
+}
+
+ff "$@"

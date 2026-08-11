@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# Kill the process that is listening on a given port.
+#   port-kill 3000 --> kill the process on port 3000
+#   port-kill 8080 --> kill the process on port 8080
+port-kill() {
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a port number."
+    echo "Usage: port-kill <port>"
+    return 1
+  fi
+
+  local port="$1"
+
+  if ! command -v lsof > /dev/null; then
+    echo "Error: 'lsof' is not installed. Install it first (e.g., sudo apt install lsof)."
+    return 1
+  fi
+
+  # -t: print only PIDs (terse output), -i :<port>: filter by the given port
+  local pid
+  pid=$(lsof -t -i :"$port" 2>/dev/null)
+
+  if [ -z "$pid" ]; then
+    echo "No process found on port $port."
+    return 0
+  fi
+
+  echo "Process on port $port:"
+  lsof -i :"$port"
+  echo ""
+
+  read -p "Kill process $pid? [y/n] " -n 1 -r
+  echo ""
+
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    kill "$pid"
+    echo "Process $pid killed."
+  else
+    echo "Aborted."
+  fi
+}
+
+port-kill "$@"

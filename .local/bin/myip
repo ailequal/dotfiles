@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Print the local network IP and the public (external) IP.
+#   myip --> prints both IPs
+myip() {
+  local local_ip
+  local public_ip
+
+  # detect OS to get the local IP using the appropriate tool
+  if [[ "$(uname)" == "Darwin" ]]; then
+    # macOS: ipconfig reads from a specific interface (en0 = wifi, en1 = ethernet)
+    local_ip=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null)
+  else
+    # linux: hostname -I returns all IPs; take the first one (primary interface)
+    local_ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+  fi
+
+  local_ip="${local_ip:-unavailable}"
+
+  # public IP is fetched the same way on all platforms
+  public_ip=$(curl -s --max-time 5 https://api.ipify.org 2>/dev/null)
+  public_ip="${public_ip:-unavailable}"
+
+  echo "local:  $local_ip"
+  echo "public: $public_ip"
+}
+
+myip "$@"

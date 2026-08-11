@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Show which process is listening on a given port.
+#   port-who 3000 --> show the process on port 3000
+#   port-who 8080 --> show the process on port 8080
+port-who() {
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a port number."
+    echo "Usage: port-who <port>"
+    return 1
+  fi
+
+  local port="$1"
+
+  if ! command -v lsof > /dev/null; then
+    echo "Error: 'lsof' is not installed. Install it first (e.g., sudo apt install lsof)."
+    return 1
+  fi
+
+  # -i :<port>: filter by the given port
+  lsof -i :"$port"
+}
+
+port-who "$@"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# list all files modified in a specific commit
+#   git-files-commit HEAD     --> list files in the latest commit
+#   git-files-commit HEAD~1   --> list files in the previous commit
+#   git-files-commit a1b2c3d4 --> list files in a specific commit hash
+git-files-commit() {
+  # check if the user provided a target commit
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a target commit (e.g., HEAD, HEAD~1, a1b2c3d4)."
+    echo "Usage: git-files-commit <target_commit>"
+    return 1
+  fi
+
+  local target_commit="$1"
+
+  # --name-only: shows only the file names
+  # --format="": hides the commit message and author info
+  git show --name-only --format="" "$target_commit"
+}
+
+git-files-commit "$@"

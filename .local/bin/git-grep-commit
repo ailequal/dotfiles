@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# search a keyword only within the entire contents of files that were modified in a specific commit
+#   git-grep-commit HEAD "TODO"                 --> search modified files in the latest commit
+#   git-grep-commit a1b2c3d4 "FIXME"            --> search modified files in a specific commit hash
+#   git-grep-commit HEAD~2 "hello world"        --> search modified files two commits ago (only that one)
+git-grep-commit() {
+  # check if the user provided a target commit
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a target commit (e.g., HEAD, HEAD~1, a1b2c3d4)."
+    echo "Usage: git-grep-commit <target_commit> <search_term>"
+    return 1
+  fi
+
+  # check if the user provided a search term
+  if [ -z "$2" ]; then
+    echo "Error: you must provide a search term."
+    echo "Usage: git-grep-commit <target_commit> <search_term>"
+    return 1
+  fi
+
+  # $1 is the first argument (the commit hash or reference)
+  local target_commit="$1"
+
+  # $2 is the second argument (the search string)
+  local search_term="$2"
+
+  # get the list of files modified in the target commit and store them in an array
+  local modified_files=( $(git show --name-only --format="" "$target_commit") )
+
+  # safety check: if the array is empty (no modified files), exit gracefully
+  if [ ${#modified_files[@]} -eq 0 ]; then
+    echo "No files were modified in commit: $target_commit"
+    return 0
+  fi
+
+  # run the git grep command
+  # "${modified_files[@]}" expands the array into safely quoted, separate arguments
+  git grep "$search_term" "$target_commit" -- "${modified_files[@]}"
+}
+
+git-grep-commit "$@"

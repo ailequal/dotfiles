@@ -1,0 +1,26 @@
+# tig setup for captuccin macchiato
+# (rearranges the color palette properly)
+
+# general ui
+color default       default default
+color cursor        black   green   bold
+color title-blur    black   blue
+color title-focus   black   blue    bold
+
+# main view
+color author        cyan    default
+color date          black   default bold
+color commit        blue    default
+
+# diffs
+color diff-header   yellow  default
+color diff-index    blue    default
+color diff-chunk    magenta default
+color diff-add      green   default
+color diff-del      red     default
+
+# status view
+color status.header   blue    default
+color stat-staged     green   default
+color stat-unstaged   red     default
+color stat-untracked  magenta default

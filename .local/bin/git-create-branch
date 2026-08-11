@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# create a new branch interactively following conventional branching rules
+#   git-create-branch --> starts the guided prompt to build the branch name
+git-create-branch() {
+  echo "=== Guided Branch Creation ==="
+
+  # 1. select prefix
+  local prefixes=("feat" "fix" "docs" "chore" "refactor" "test" "ci" "release" "Quit")
+  local selected_prefix=""
+
+  echo "Select the branch type (prefix):"
+  # PS3 is the prompt string used by the 'select' command
+  PS3="Enter a number (1-${#prefixes[@]}): "
+  select opt in "${prefixes[@]}"; do
+    if [ "$opt" = "Quit" ]; then
+      echo "Aborted."
+      return 0
+    elif [ -n "$opt" ]; then
+      selected_prefix="$opt"
+      break
+    else
+      echo "Invalid option. Try again."
+    fi
+  done
+
+  # 2. ask for issue number (optional for all prefixes)
+  local issue_number=""
+  while true; do
+    printf "Enter the issue number (optional, press Enter to skip, e.g., 102): "
+    read input_issue
+
+    # if empty, break out of the loop immediately
+    if [ -z "$input_issue" ]; then
+      break
+    fi
+
+    # check if the input is strictly numeric using case for bash/zsh cross-compatibility
+    case "$input_issue" in
+      *[!0-9]*)
+        echo "Error: Issue number must be strictly numeric if provided. Try again."
+        ;;
+      *)
+        issue_number="$input_issue"
+        break
+        ;;
+    esac
+  done
+
+  # 3. ask for description (mandatory)
+  local description=""
+  while true; do
+    printf "Enter a brief description (e.g., 'login auth'): "
+    read input_desc
+
+    if [ -n "$input_desc" ]; then
+      # sanitize input:
+      #   1. tr: convert to lowercase
+      #   2. sed: replace any non-alphanumeric character with a hyphen
+      #   3. sed: collapse multiple sequential hyphens into a single hyphen
+      #   4. sed: remove trailing and leading hyphens just in case
+      description=$(echo "$input_desc" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\{2,\}/-/g' | sed 's/^-//;s/-$//')
+      break
+    else
+      echo "Error: Description cannot be empty."
+    fi
+  done
+
+  # 4. construct the final branch name
+  local branch_name=""
+  if [ -n "$issue_number" ]; then
+    branch_name="${selected_prefix}/${issue_number}-${description}"
+  else
+    branch_name="${selected_prefix}/${description}"
+  fi
+
+  # 5. create and checkout the branch
+  echo ""
+  echo "Creating and switching to branch: $branch_name"
+  git checkout -b "$branch_name"
+}
+
+git-create-branch "$@"

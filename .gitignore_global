@@ -1,0 +1,87 @@
+#####################
+# .gitignore_global #
+#####################
+
+# git
+.gitconfig
+*.orig
+*.rej
+
+# compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.out
+*.dylib
+*.app
+
+# packages
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.tar.gz
+*.zip
+*.apk
+*.msi
+
+# logs and databases
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+
+# os generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+# Icon?
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Trash-*
+
+# temporary files
+*~
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# dependencies
+node_modules/
+jspm_packages/
+bower_components/
+vendor/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+env/
+venv/
+ENV/
+.pytest_cache/
+pip-log.txt
+
+# editors and ides
+.idea/
+*.suo
+*.sln
+.history/
+
+# secrets
+.env

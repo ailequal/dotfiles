@@ -1,0 +1,287 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# CONFIGURATION & PHILOSOPHY
+# ==============================================================================
+# IMPORTANT: THE REPOSITORY IS THE SOURCE OF TRUTH.
+# In all diffs and status checks, the repository version is always treated as 
+# the original (left side), and the local system file is the modified (right side).
+# 
+# How to read the status output:
+#   [~] Modified : The local file differs from the repo version.
+#   [+] Untracked: The file exists locally, but is missing from the repo.
+#   [-] Missing  : The file exists in the repo, but is missing/deleted locally.
+#
+# Examples:
+#   dotfiles-diff ~/.zshrc                     --> diffs repo's .zshrc against local's .zshrc
+#   dotfiles-diff --status ~/.config/tmux/     --> shows what local tmux files differ from the repo
+#   dotfiles-diff -s ~/.zshrc ~/repos/dots/    --> handles multiple mixed inputs with status flag
+#
+# Define the default path to your dotfiles repository.
+# You can override this by setting the DOTFILES_REPO environment variable before 
+# running the script (e.g., DOTFILES_REPO="~/my-dotfiles" dotfiles-diff ~/.zshrc)
+DOTFILES_REPO="${DOTFILES_REPO:-$HOME/repos/dotfiles}"
+
+# Define the pager to use for displaying full diffs.
+# Supported values:
+#   "default" : Uses the standard behavior (git's default less, or raw stdout for standard diff).
+#   "bat"     : Uses 'bat' with diff syntax highlighting.
+#   "delta"   : Uses 'delta' (https://github.com/dandavison/delta) for advanced diff viewing.
+# If 'bat' or 'delta' is specified but not installed, the script will quit early.
+# You can override this by setting the DIFF_PAGER environment variable.
+DIFF_PAGER="${DIFF_PAGER:-default}"
+
+# Define files and directories to completely ignore during comparisons.
+# This prevents noisy diffs from version control, cache folders, or macOS artifacts.
+IGNORE_PATTERNS=(
+  ".git"
+  ".DS_Store"
+  "*.swp"
+)
+# ==============================================================================
+
+dotfiles-diff() {
+  # remove potential trailing slashes for safe string matching
+  local repo_dir="${DOTFILES_REPO%/}"
+  local home_dir="${HOME%/}"
+
+  # validate the selected pager and quit early if conditions are not met
+  if [ "$DIFF_PAGER" = "bat" ]; then
+    if ! command -v bat >/dev/null 2>&1; then
+      echo "Error: DIFF_PAGER is set to 'bat', but 'bat' is not installed."
+      return 1
+    fi
+  elif [ "$DIFF_PAGER" = "delta" ]; then
+    if ! command -v delta >/dev/null 2>&1; then
+      echo "Error: DIFF_PAGER is set to 'delta', but 'delta' is not installed."
+      return 1
+    fi
+  elif [ "$DIFF_PAGER" != "default" ]; then
+    echo "Error: Unsupported DIFF_PAGER '$DIFF_PAGER'. Supported options are 'default', 'bat', and 'delta'."
+    return 1
+  fi
+
+  local status_only=false
+  local paths=()
+
+  # parse arguments to separate flags from file paths
+  for arg in "$@"; do
+    case "$arg" in
+      -s|--status)
+        status_only=true
+        ;;
+      -*)
+        echo "Error: unknown option '$arg'"
+        echo "Usage: dotfiles-diff [-s|--status] <path1> [path2] ..."
+        return 1
+        ;;
+      *)
+        paths+=("$arg")
+        ;;
+    esac
+  done
+
+  # check if the user provided at least one path argument
+  if [ "${#paths[@]}" -eq 0 ]; then
+    echo "Error: you must provide at least one file or directory to compare."
+    echo "Usage: dotfiles-diff [-s|--status] <path1> [path2] ..."
+    return 1
+  fi
+
+  # dynamically build global exclusion rules
+  local global_git_excludes=()
+  local global_diff_excludes=()
+  for pattern in "${IGNORE_PATTERNS[@]}"; do
+    global_diff_excludes+=("--exclude=$pattern")
+    global_git_excludes+=(":(exclude)**/${pattern}")
+    global_git_excludes+=(":(exclude)**/${pattern}/**")
+    global_git_excludes+=(":(exclude)${pattern}")
+  done
+
+  # loop over all parsed path arguments
+  for input_path in "${paths[@]}"; do
+    local abs_path
+    
+    # remove trailing slash from input for consistent directory handling
+    input_path="${input_path%/}"
+
+    # convert the input path to an absolute path for reliable matching
+    if [[ "$input_path" = /* ]]; then
+      abs_path="$input_path"
+    else
+      abs_path="$PWD/$input_path"
+    fi
+
+    local local_path
+    local repo_path
+    local rel_path
+
+    # determine if the provided path is in the repo or in the home directory
+    if [[ "$abs_path" == "$repo_dir"* ]]; then
+      rel_path="${abs_path#$repo_dir/}"
+      local_path="$home_dir/$rel_path"
+      repo_path="$abs_path"
+    elif [[ "$abs_path" == "$home_dir"* ]]; then
+      rel_path="${abs_path#$home_dir/}"
+      local_path="$abs_path"
+      repo_path="$repo_dir/$rel_path"
+    else
+      echo "Error: '$input_path' is not located within $home_dir or $repo_dir. Skipping."
+      continue
+    fi
+
+    # safety check: if both paths are completely missing, skip to the next argument
+    if [ ! -e "$local_path" ] && [ ! -e "$repo_path" ]; then
+      echo "Error: neither the local path nor the repo path exists for '$rel_path'. Skipping."
+      continue
+    fi
+
+    local diff_local="$local_path"
+    local diff_repo="$repo_path"
+    local temp_dir=""
+    local active_git_excludes=()
+    local active_diff_excludes=()
+
+    # check if the existing target is a directory or a file
+    if [ -d "$local_path" ] || [ -d "$repo_path" ]; then
+      
+      # --- DIRECTORY HANDLING ---
+      # ONLY apply exclusions if we are comparing directories
+      active_git_excludes=("${global_git_excludes[@]}")
+      active_diff_excludes=("${global_diff_excludes[@]}")
+
+      if [ ! -d "$local_path" ]; then
+        [ "$status_only" = false ] && echo "Warning: local directory is missing ($local_path)"
+        temp_dir=$(mktemp -d)
+        diff_local="$temp_dir"
+      elif [ ! -d "$repo_path" ]; then
+        [ "$status_only" = false ] && echo "Warning: repo directory is missing ($repo_path)"
+        temp_dir=$(mktemp -d)
+        diff_repo="$temp_dir"
+      fi
+      
+    else
+      # --- FILE HANDLING ---
+      if [ ! -f "$local_path" ]; then
+        [ "$status_only" = false ] && echo "Warning: local file is missing ($local_path)"
+        diff_local="/dev/null"
+      elif [ ! -f "$repo_path" ]; then
+        [ "$status_only" = false ] && echo "Warning: repo file is missing ($repo_path)"
+        diff_repo="/dev/null"
+      fi
+    fi
+
+    echo -e "\n=============================================================================="
+    echo "Target: $rel_path"
+    echo "=============================================================================="
+
+    # --- DYNAMIC COMMAND BUILDING ---
+    # Repo (source of truth) is ALWAYS passed first, Local (subject) is passed second.
+    
+    local git_cmd=(git diff --no-index)
+    [ "$status_only" = true ] && git_cmd+=(--name-status)
+    git_cmd+=("$diff_repo" "$diff_local")
+    
+    # append exclusions only if the array is populated (i.e., it's a directory)
+    if [ ${#active_git_excludes[@]} -gt 0 ]; then
+      git_cmd+=(-- "${active_git_excludes[@]}")
+    fi
+
+    local diff_cmd=(diff)
+    if [ "$status_only" = true ]; then
+      diff_cmd+=(-qr)
+    else
+      diff_cmd+=(-urN)
+    fi
+    diff_cmd+=("${active_diff_excludes[@]}" "$diff_repo" "$diff_local")
+
+    # --- EXECUTION & PARSING ---
+    if [ "$status_only" = true ]; then
+      # STATUS MODE
+      if command -v git >/dev/null 2>&1; then
+        
+        # execute dynamic git command
+        "${git_cmd[@]}" | while read -r status target_file; do
+          
+          # strip absolute prefixes to show clean relative paths
+          local display_path="$target_file"
+          display_path="${display_path#$repo_dir/}"
+          display_path="${display_path#$home_dir/}"
+          if [ -n "$temp_dir" ]; then display_path="${display_path#$temp_dir/}"; fi
+
+          # Translate git status codes based on Repo being the absolute source of truth
+          case "$status" in
+            M*) echo "  [~] Modified (Local differs) : $display_path" ;;
+            A*) echo "  [+] Untracked (Local only)   : $display_path" ;;
+            D*) echo "  [-] Missing (Deleted locally): $display_path" ;;
+            T*) echo "  [T] Type Changed             : $display_path" ;;
+            *)  echo "  [*] $status                  : $display_path" ;;
+          esac
+        done
+      else
+        # fallback: use standard diff quiet/recursive output and parse it
+        "${diff_cmd[@]}" | while read -r line; do
+          if [[ "$line" == "Only in "* ]]; then
+            # extract directory and filename parts from "Only in /dir: filename"
+            local dir_part=$(echo "$line" | awk -F': ' '{print $1}' | sed 's/^Only in //')
+            local file_part=$(echo "$line" | awk -F': ' '{print $2}')
+            
+            local display_path="$dir_part/$file_part"
+            display_path="${display_path#$repo_dir/}"
+            display_path="${display_path#$home_dir/}"
+            if [ -n "$temp_dir" ]; then display_path="${display_path#$temp_dir/}"; fi
+
+            # Determine if the 'Only in' file is local (new/untracked) or repo (deleted locally)
+            if [[ "$dir_part" == "$diff_local"* ]]; then
+               echo "  [+] Untracked (Local only)   : $display_path"
+            else
+               echo "  [-] Missing (Deleted locally): $display_path"
+            fi
+          elif [[ "$line" == "Files "* ]]; then
+            # extract the first file from "Files /dir1/file and /dir2/file differ"
+            local file_part=$(echo "$line" | awk '{print $2}')
+            
+            local display_path="$file_part"
+            display_path="${display_path#$repo_dir/}"
+            display_path="${display_path#$home_dir/}"
+            
+            echo "  [~] Modified (Local differs) : $display_path"
+          fi
+        done
+      fi
+    else
+      # FULL DIFF MODE
+      if [ "$DIFF_PAGER" = "bat" ]; then
+        if command -v git >/dev/null 2>&1; then
+          # Piping git diff implicitly disables its internal pager and color. 
+          # We pass it to bat and explicitly tell it to parse as diff syntax.
+          "${git_cmd[@]}" | bat -l diff
+        else
+          "${diff_cmd[@]}" | bat -l diff
+        fi
+      elif [ "$DIFF_PAGER" = "delta" ]; then
+        if command -v git >/dev/null 2>&1; then
+          "${git_cmd[@]}" | delta
+        else
+          "${diff_cmd[@]}" | delta
+        fi
+      else
+        # Default fallback
+        if command -v git >/dev/null 2>&1; then
+          "${git_cmd[@]}"
+        else
+          "${diff_cmd[@]}"
+        fi
+      fi
+    fi
+
+    # clean up the temporary empty directory if one was created
+    if [ -n "$temp_dir" ] && [ -d "$temp_dir" ]; then
+      rm -rf "$temp_dir"
+    fi
+
+  done
+}
+
+# execute the function passing all script arguments safely
+dotfiles-diff "$@"

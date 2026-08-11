@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+###################
+# bootstrap-linux #
+###################
+
+# update os && upgrade os
+sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove
+
+# apt
+# sudo apt -y install chafa
+sudo apt -y install cheese
+sudo apt -y install cloc
+sudo apt -y install curl
+sudo apt -y install fd-find && mkdir -p ~/.local/bin && ln -sf $(which fdfind) ~/.local/bin/fd
+sudo apt -y install ffmpeg
+sudo apt -y install fzf
+sudo apt -y install gimp
+sudo apt -y install git
+sudo apt -y install gnome-shell-extensions
+sudo apt -y install gpg
+sudo apt -y install handbrake
+sudo apt -y install htop
+sudo apt -y install lolcat
+sudo apt -y install lsof
+sudo apt -y install make
+sudo apt -y install mpv
+# sudo apt -y install neofetch
+sudo apt -y install openssl
+sudo apt -y install pip
+sudo apt -y install pngquant
+sudo apt -y install python3
+sudo apt -y install python-is-python3
+sudo apt -y install ripgrep
+sudo apt -y install speedtest-cli
+sudo apt -y install tar
+sudo apt -y install tig
+# sudo apt -y install tmate
+sudo apt -y install tmux
+sudo apt -y install tree
+sudo apt -y install vim
+sudo apt -y install vlc
+sudo apt -y install wavemon
+sudo apt -y install wl-clipboard
+
+# snap
+sudo snap install 0ad
+sudo snap install bruno
+sudo snap install code --classic
+sudo snap install slack
+sudo snap install spotify
+sudo snap install telegram-desktop

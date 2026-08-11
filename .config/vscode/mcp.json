@@ -1,0 +1,16 @@
+{
+  "inputs": [],
+  "servers": {
+    "context7": {
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "command": "npx",
+      "type": "stdio"
+    },
+    "markitdown": {
+      "args": ["markitdown-mcp"],
+      "command": "uvx",
+      "gallery": true,
+      "type": "stdio"
+    }
+  }
+}

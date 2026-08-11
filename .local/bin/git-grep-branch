@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# search a keyword only within the entire contents of files modified across an entire branch
+#   git-grep-branch dev "TODO"   --> search in files modified between 'dev' and current branch
+#   git-grep-branch main "FIXME" --> search in files modified between 'main' and current branch
+git-grep-branch() {
+  # check if the user provided a base branch
+  if [ -z "$1" ]; then
+    echo "Error: you must provide a base branch (e.g., dev, main)."
+    echo "Usage: git-grep-branch <base_branch> <search_term>"
+    return 1
+  fi
+
+  # check if the user provided a search term
+  if [ -z "$2" ]; then
+    echo "Error: you must provide a search term."
+    echo "Usage: git-grep-branch <base_branch> <search_term>"
+    return 1
+  fi
+
+  # $1 is the first argument (the base branch you branched off from)
+  local base_branch="$1"
+
+  # $2 is the second argument (the search string)
+  local search_term="$2"
+
+  # get the list of files modified between the base branch and your current commit (HEAD)
+  # and store them in an array.
+  # the "..." tells git to find the exact point where your branch diverged from the base
+  # --diff-filter=d ignores deleted files so git grep doesn't crash trying to read them
+  local modified_files=( $(git diff --name-only --diff-filter=d "$base_branch"...HEAD) )
+
+  # safety check: if the array is empty (no modified files), exit gracefully
+  if [ ${#modified_files[@]} -eq 0 ]; then
+    echo "No files were modified between $base_branch and HEAD."
+    return 0
+  fi
+
+  # run the git grep command
+  # we search in HEAD (the current state of your branch)
+  # "${modified_files[@]}" expands the array into safely quoted, separate arguments
+  git grep "$search_term" HEAD -- "${modified_files[@]}"
+}
+
+git-grep-branch "$@"

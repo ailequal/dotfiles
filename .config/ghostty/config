@@ -1,0 +1,55 @@
+# general & theme #
+###################
+
+language = en
+theme = "Catppuccin Macchiato"
+
+
+# fonts #
+#########
+
+font-family = "JetBrainsMono Nerd Font Mono"
+font-family-bold = "JetBrainsMono Nerd Font Mono"
+font-family-italic = "JetBrainsMono Nerd Font Mono"
+font-family-bold-italic = "JetBrainsMono Nerd Font Mono"
+font-size = 18
+
+
+# window & tabs #
+#################
+
+window-save-state = always
+window-inherit-font-size = false
+window-step-resize = false
+window-width = 100
+window-height = 28
+window-new-tab-position = "end"
+window-inherit-working-directory = "false"
+tab-inherit-working-directory = "false"
+
+
+# shell & cursor #
+##################
+
+shell-integration-features = "no-title,no-cursor"
+cursor-style = "block"
+
+
+# mouse & scrolling #
+#####################
+
+# precision: touchpads / trackpads (default 1)
+# discrete:  mouse wheels          (default 3)
+mouse-scroll-multiplier = precision:1,discrete:3
+
+mouse-hide-while-typing = true
+
+
+# notifications & bell #
+########################
+
+bell-features = "system,attention,title,border"
+desktop-notifications = true
+notify-on-command-finish = "unfocused"
+notify-on-command-finish-action = "bell,notify"
+notify-on-command-finish-after = "10s"

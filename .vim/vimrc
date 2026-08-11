@@ -1,0 +1,124 @@
+" baseline & defaults "
+"""""""""""""""""""""""
+
+" load vim sane modern defaults
+unlet! skip_defaults_vim
+source $VIMRUNTIME/defaults.vim
+
+" upgrade the '%' key to jump between HTML tags (<div>/</div>) and code blocks
+if has('syntax') && has('eval')
+  packadd! matchit
+endif
+
+
+" leader key "
+""""""""""""""
+let mapleader = " " " prefix for custom shortcuts
+
+
+" quality of life "
+"""""""""""""""""""
+" set hidden                " allow switching between buffers without saving them first
+" set updatetime=300        " faster refresh rate (default is 4000ms), makes plugins feel snappier
+" set signcolumn=yes        " always show the sign column (prevents text shifting when git/LSP adds icons)
+set scrolloff=8             " keep 8 lines of context above/below the cursor when scrolling
+" set clipboard=unnamed     " use the `+` system register for all operations (yank, delete, change, put) for macos
+" set clipboard=unnamedplus " use the `+` system register for all operations (yank, delete, change, put) for linux
+set mouse=a                 " enable mouse support
+
+
+" indentation & formatting "
+""""""""""""""""""""""""""""
+set tw=120          " (textwidth) hard-wrap text to the next line after xyz characters
+set expandtab       " convert tabs to spaces
+set shiftwidth=2    " the number of spaces inserted for each indentation
+set tabstop=2       " how many columns a tab counts for
+set smartindent     " automatically inserts one extra level of indentation in some cases
+
+
+" search & editing "
+""""""""""""""""""""
+
+set ic        " (ignorecase) make searches case-insensitive by default
+set smartcase " (capital smart) search becomes case-sensitive if you type a capital letter
+set path+=** " recursive search in the project
+" set spelllang=en,it " set spell checker languages (needs `set spell` to turn on)
+
+" ignore common folders and binary files
+set wildignore+=*/node_modules/*
+set wildignore+=*/.git/*
+set wildignore+=*/dist/*,*/build/*
+set wildignore+=*.o,*.obj,*.class,*.pyc " ignore compiled files
+set wildignore+=*.png,*.jpg,*.gif,*.ico " ignore media files
+
+" clear search highlights with escape in normal mode
+nnoremap <esc> :noh<return><esc>
+
+" delete a single character without copying it to the clipboard
+nnoremap x "_x
+
+" move highlighted blocks of text up and down
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" join lines keeping cursor still
+nnoremap J mzJ`z
+
+
+" ui & display "
+""""""""""""""""
+
+" enable 24-bit true colors to match ghostty
+if has('termguicolors')
+  set termguicolors
+endif
+
+" install catpuccin: `git clone https://github.com/catppuccin/vim.git ~/.vim/pack/vendor/start/catppuccin`
+colorscheme catppuccin_macchiato " or ron
+
+set nu                                                   " (number) show the absolute line number on your current line
+set rnu                                                  " (relativenumber) show relative distances on all other lines
+" set cursorcolumn                                       " highlight the entire vertical column your cursor is in
+" set cursorline                                         " highlight the entire horizontal line your cursor is on
+" highlight CursorLine guibg=lightblue ctermbg=lightgrey " custom color for cursor line
+
+set list " show invisible characters
+" define characters to show
+set listchars=space:·,tab:→\ ,trail:•,nbsp:␣ " " custom
+" set listchars=space:·,tab:→\ ,trail:•,nbsp:␣,eol:↴ " all characters
+
+" switch to a block in normal mode
+let &t_EI = "\e[2 q"
+" switch to a vertical line in insert mode
+let &t_SI = "\e[6 q"
+
+
+" netrw "
+"""""""""
+
+let g:netrw_liststyle=1      " 0: thin, 1: long (timestamp/size), 2: wide, 3: tree view
+" let g:netrw_browse_split = 4 " when you pick a file, open it in the previous window (acts like a sidebar)
+" let g:netrw_winsize = 20     " constrain the file explorer width to 20% of the screen
+
+
+" navigation "
+""""""""""""""
+
+" move by display lines (wrapped lines) instead of logical lines
+" a count still jumps logical lines (e.g. 5j), matching the relativenumber gutter
+nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+vnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+vnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+
+" disable standard arrow keys in normal mode
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Left> <Nop>
+noremap <Right> <Nop>
+
+" disable standard arrow keys in insert mode
+inoremap <Up> <Nop>
+inoremap <Down> <Nop>
+inoremap <Left> <Nop>
+inoremap <Right> <Nop>

@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+###################
+# bootstrap-macos #
+###################
+
+# update homebrew && upgrade homebrew
+brew update && brew upgrade
+
+# casks
+brew install --cask 1password
+# brew install --cask alacritty
+brew install --cask appcleaner
+brew install --cask bruno
+brew install --cask coconutbattery
+brew install --cask cyberduck
+brew install --cask discord
+brew install --cask docker
+brew install --cask firefox
+brew install --cask font-jetbrains-mono-nerd-font
+brew install --cask ghostty
+# brew install --cask logitech-options
+# brew install --cask google-backup-and-sync
+brew install --cask google-chrome
+brew install --cask handbrake
+# brew install --cask karabiner-elements
+brew install --cask keepingyouawake
+brew install --cask keka
+# brew install --cask mactracker
+brew install --cask markedit
+# brew install --cask monitorcontrol
+brew install --cask slack
+brew install --cask spotify
+brew install --cask stats
+brew install --cask sublime-text
+brew install --cask telegram
+brew install --cask transmission
+brew install --cask visual-studio-code
+brew install --cask vlc
+
+# formulae
+brew install bat
+# brew install chafa
+brew install curl
+brew install dua-cli
+brew install eza
+brew install fastfetch
+brew install fd
+brew install ffmpeg
+brew install fzf
+brew install git
+brew install git-delta
+brew install gnupg
+brew install htop
+brew install lazydocker
+brew install lazygit
+brew install lolcat
+brew install mactop
+brew install mpv
+brew install neovim
+brew install opencode
+brew install openspec
+brew install openssl
+brew install pinentry-mac
+brew install pngquant
+brew install ripgrep
+# brew install thefuck
+brew install tig
+# brew install tmate
+brew install tmux
+brew install tokei
+brew install tree
+brew install yt-dlp
+brew install vim
+brew install zellij
+brew install zoxide

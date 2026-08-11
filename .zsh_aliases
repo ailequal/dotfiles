@@ -1,0 +1,40 @@
+# aliases #
+###########
+
+# ls
+# alias ls='ls --color=auto'
+
+# cat
+# alias cat='bat --style=auto'
+# alias ccat='/bin/cat'
+
+# python
+alias python=python3
+alias pip=pip3
+
+# youtube
+alias yt-dl-music="yt-dlp -f bestaudio -x --audio-format m4a $1"
+alias yt-dl-video="yt-dlp -f bestvideo+bestaudio $1"
+alias yt-str-music="mpv --no-video --loop-file $1"
+alias yt-str-video="mpv --ytdl-format=\"bestvideo[height<=?720]+bestaudio/best\""
+alias yt-up="brew upgrade yt-dlp" # if installed with homebrew
+
+# docker
+# alias d='docker'
+# alias dc='docker compose'
+# alias dps='docker ps'
+# alias dpsa='docker ps -a'
+# alias di='docker images'
+
+# random
+alias ciao-mondo="echo hello-world | lolcat"
+alias clip='pbcopy' # macos only
+alias fp="fzf --preview 'bat --style=numbers --color=always {}'"
+alias lvim="NVIM_APPNAME=lvim nvim"
+alias gl='git log --oneline --graph --decorate'
+alias speedtest='networkQuality -sv' # macos only
+alias clear-dns-cache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder' # macos only
+alias path='echo $PATH | tr ":" "\n"' # print each path entry on a new line
+alias h='history'
+alias completions-refresh='rm -f ~/.zcompdump && source ~/.zshrc' # reload completions cache and re-source config
+alias reload='exec zsh' # reload the shell

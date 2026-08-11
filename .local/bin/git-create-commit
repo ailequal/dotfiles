@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+
+# create a new commit interactively following conventional commits rules and trailers
+#   git-create-commit --> starts the guided prompt to build the commit message
+git-create-commit() {
+  echo "=== Guided Commit Creation ==="
+
+  # 1. select type
+  local types=("feat" "fix" "docs" "chore" "refactor" "test" "ci" "release" "Quit")
+  local selected_type=""
+
+  echo "Select the commit type:"
+  PS3="Enter a number (1-${#types[@]}): "
+  select opt in "${types[@]}"; do
+    if [ "$opt" = "Quit" ]; then
+      echo "Aborted."
+      return 0
+    elif [ -n "$opt" ]; then
+      selected_type="$opt"
+      break
+    else
+      echo "Invalid option. Try again."
+    fi
+  done
+
+  # 2. ask for scope (optional)
+  local scope=""
+  printf "Enter the scope (optional, press Enter to skip, e.g., 'auth', 'ui'): "
+  read input_scope
+  if [ -n "$input_scope" ]; then
+    # sanitize: lowercase and remove spaces
+    scope=$(echo "$input_scope" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+  fi
+
+  # 3. ask for description
+  local description=""
+  while true; do
+    printf "Enter a brief description (imperative mood, lowercase, no period, e.g., 'add auth system'): "
+    read input_desc
+
+    if [ -n "$input_desc" ]; then
+      description="$input_desc"
+      break
+    else
+      echo "Error: Description cannot be empty."
+    fi
+  done
+
+  # 4. ask for issue relationship (Refs/Closes)
+  local trailer_issue_type=""
+  local issue_ref=""
+
+  echo ""
+  echo "Does this commit relate to an issue?"
+  echo "1) Refs (related but does not resolve)"
+  echo "2) Closes (fully resolves issue)"
+  printf "Enter 1 or 2 (press Enter for None): "
+  read issue_opt
+
+  case "$issue_opt" in
+    1)
+      trailer_issue_type="Refs"
+      ;;
+    2)
+      trailer_issue_type="Closes"
+      ;;
+    *)
+      trailer_issue_type=""
+      ;;
+  esac
+
+  # enforce fully qualified issue paths if an issue is selected
+  if [ -n "$trailer_issue_type" ]; then
+    while true; do
+      printf "Enter the FULLY QUALIFIED issue reference (e.g., owner/repo#123): "
+      read input_ref
+
+      # escaped '#' to prevent Zsh bad pattern errors
+      case "$input_ref" in
+        */*\#*[0-9]*)
+           issue_ref="$input_ref"
+           break
+           ;;
+        *)
+           echo "Error: Issue MUST use the fully qualified project path. Bare numbers like '#123' are not allowed."
+           ;;
+      esac
+    done
+  fi
+
+  # 5. ask for AI assistance (Assisted-by)
+  local assisted_by=""
+  echo ""
+  printf "Did an AI help write this code? (y/N): "
+  read ai_help
+  case "$ai_help" in
+    [yY]|[yY][eE][sS])
+      while true; do
+         printf "Enter the AI signature (e.g., claude-code/claude-opus-4.8): "
+         read input_ai
+         if [ -n "$input_ai" ]; then
+           assisted_by="$input_ai"
+           break
+         else
+           echo "Error: AI signature cannot be empty if AI assisted."
+         fi
+      done
+      ;;
+  esac
+
+  # 6. construct the final commit message header
+  local commit_msg=""
+  if [ -n "$scope" ]; then
+    commit_msg="${selected_type}(${scope}): ${description}"
+  else
+    commit_msg="${selected_type}: ${description}"
+  fi
+
+  # 7. construct the git command using an array for safe execution with spaces/quotes
+  local cmd=(git commit -m "$commit_msg")
+
+  # append issue trailer if present
+  if [ -n "$trailer_issue_type" ] && [ -n "$issue_ref" ]; then
+    cmd+=(--trailer "${trailer_issue_type}: ${issue_ref}")
+  fi
+
+  # append AI trailer if present
+  if [ -n "$assisted_by" ]; then
+    cmd+=(--trailer "Assisted-by: ${assisted_by}")
+  fi
+
+  # 8. display and execute
+  echo ""
+  echo "--- Executing Command ---"
+
+  # print the command visually without dangling backslashes
+  echo -n "git commit -m \"$commit_msg\""
+
+  if [ -n "$trailer_issue_type" ] && [ -n "$issue_ref" ]; then
+    echo " \\"
+    echo -n "  --trailer \"${trailer_issue_type}: ${issue_ref}\""
+  fi
+
+  if [ -n "$assisted_by" ]; then
+    echo " \\"
+    echo -n "  --trailer \"Assisted-by: ${assisted_by}\""
+  fi
+
+  echo ""
+  echo "-------------------------"
+
+  # execute the array safely
+  "${cmd[@]}"
+}
+
+git-create-commit "$@"
