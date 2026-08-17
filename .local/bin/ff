@@ -3,7 +3,9 @@
 # find files by name, using the exact same defaults as ripgrep (rg)
 # the pattern is a regex matched against the file path, and the files considered
 # are the ones rg would search: .gitignore and .ignore rules are respected,
-# hidden files and symlinked directories are skipped, matching is case sensitive
+# hidden files and symlinked directories are skipped, matching is smart-case
+# (case insensitive unless the pattern contains an uppercase letter; pass -s
+# to force case sensitive matching)
 #   ff config                --> list files whose path matches 'config'
 #   ff '\.env$'              --> regex: only paths ending in .env
 #   ff '^src/.*\.ts$'        --> regex: typescript files under src/
@@ -32,8 +34,10 @@ ff() {
   # the work is split across two rg calls: the first one lists the candidate
   # files, the second one matches the pattern against those paths. each option
   # is routed to the call it belongs to, so it keeps its usual rg meaning
-  local list_opts=()  # options deciding WHICH files are walked
-  local match_opts=() # options deciding HOW the pattern matches
+  local list_opts=()      # options deciding WHICH files are walked
+  local match_opts=(-S)   # options deciding HOW the pattern matches; smart-case
+                          # is the default, a later -s or -i flag overrides it
+                          # because rg honors whichever case flag comes last
   local pattern=""
   local paths=()
 
