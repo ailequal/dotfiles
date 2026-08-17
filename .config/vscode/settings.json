@@ -103,6 +103,7 @@
     "**/node_modules": true,
     "**/vendor": true
   },
+  "files.insertFinalNewline": true,
   "git.blame.editorDecoration.enabled": false,
   "git.openRepositoryInParentFolders": "never",
   "github.copilot.enable": {
