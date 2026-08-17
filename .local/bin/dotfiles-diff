@@ -4,23 +4,47 @@
 # CONFIGURATION & PHILOSOPHY
 # ==============================================================================
 # IMPORTANT: THE REPOSITORY IS THE SOURCE OF TRUTH.
-# In all diffs and status checks, the repository version is always treated as 
+# In all diffs and status checks, the repository version is always treated as
 # the original (left side), and the local system file is the modified (right side).
-# 
+#
 # How to read the status output:
 #   [~] Modified : The local file differs from the repo version.
 #   [+] Untracked: The file exists locally, but is missing from the repo.
 #   [-] Missing  : The file exists in the repo, but is missing/deleted locally.
 #
+# Strict mode (-r / --repo-only / --strict):
+#   By default, comparisons surface everything, including local-only files that
+#   have no counterpart in the repo ([+] Untracked). This is great to discover
+#   new things living on the machine. In strict mode, the comparison is limited
+#   to paths that actually exist in the repository, so local-only files and
+#   directories are silently ignored. Useful to answer the question:
+#   "did anything I *track* drift from the repo?"
+#   Strict directory comparisons never walk the local tree: only the repo files
+#   are enumerated and each one is checked against its local counterpart. This
+#   makes a whole-setup check ('dotfiles-diff -s -r ~') fast, even though the
+#   local side is the entire home directory.
+#
+# Exit codes (follows the classic diff convention):
+#   0 : no differences were found
+#   1 : at least one difference was found
+#   2 : usage or configuration error
+#
 # Examples:
 #   dotfiles-diff ~/.zshrc                     --> diffs repo's .zshrc against local's .zshrc
 #   dotfiles-diff --status ~/.config/tmux/     --> shows what local tmux files differ from the repo
 #   dotfiles-diff -s ~/.zshrc ~/repos/dots/    --> handles multiple mixed inputs with status flag
+#   dotfiles-diff -s -r ~/.config              --> status of tracked files only (no untracked noise)
+#   dotfiles-diff -s -r ~                      --> whole-setup check: every repo file vs the local computer
 #
 # Define the default path to your dotfiles repository.
-# You can override this by setting the DOTFILES_REPO environment variable before 
+# You can override this by setting the DOTFILES_REPO environment variable before
 # running the script (e.g., DOTFILES_REPO="~/my-dotfiles" dotfiles-diff ~/.zshrc)
 DOTFILES_REPO="${DOTFILES_REPO:-$HOME/repos/dotfiles}"
+
+# expand a leading "~/", since a quoted "~/..." in the environment variable
+# would otherwise be taken literally and never match any real path
+# (only the plain "~/" form is expanded; "~user/..." is left untouched)
+DOTFILES_REPO="${DOTFILES_REPO/#\~\//$HOME/}"
 
 # Define the pager to use for displaying full diffs.
 # Supported values:
@@ -38,7 +62,85 @@ IGNORE_PATTERNS=(
   ".DS_Store"
   "*.swp"
 )
+
+# Keep track of every temporary directory we create, so the EXIT trap below can
+# clean them all up even if the script is interrupted (Ctrl+C) mid-comparison.
+TEMP_DIRS=()
+cleanup-temp-dirs() {
+  local dir
+  for dir in "${TEMP_DIRS[@]}"; do
+    [ -d "$dir" ] && rm -rf "$dir"
+  done
+}
+trap cleanup-temp-dirs EXIT
 # ==============================================================================
+
+usage() {
+  echo "Usage: dotfiles-diff [-s|--status] [-r|--repo-only] [-h|--help] <path1> [path2] ..."
+  echo ""
+  echo "Options:"
+  echo "  -s, --status     show a summary of changed files instead of full diffs"
+  echo "  -r, --repo-only  strict mode: only compare paths that exist in the repo,"
+  echo "                   ignoring local-only (untracked) files and directories"
+  echo "                   (--strict is accepted as an alias)"
+  echo "  -h, --help       show this help message"
+  echo ""
+  echo "Whole-setup check (fast, only repo files are compared):"
+  echo "  dotfiles-diff -s -r ~"
+}
+
+# In strict mode, the plain 'diff' fallback still prints "Only in <local dir>"
+# lines for local-only files (there is no portable diff flag to suppress just
+# that side). This filter drops those lines; everything else passes through.
+# Usage: some-diff-command | strict-filter "<local dir>" "<strict bool>"
+strict-filter() {
+  local local_dir="$1"
+  local strict="$2"
+
+  if [ "$strict" = true ]; then
+    # match "Only in <local dir>:" and "Only in <local dir>/<subdir>:" exactly,
+    # using index() instead of a regex so paths with special chars are safe
+    awk -v prefix="Only in $local_dir" '
+      index($0, prefix) == 1 {
+        next_char = substr($0, length(prefix) + 1, 1)
+        if (next_char == ":" || next_char == "/") next
+      }
+      { print }
+    '
+  else
+    cat
+  fi
+}
+
+# Emit one unified diff per changed repo file against its local counterpart.
+# Used by the strict directory fast path; repo (source of truth) is always the
+# left side. Falls back to plain diff when git is unavailable.
+# Usage: emit-strict-diffs <repo base> <local base> <repo file> [repo file...]
+emit-strict-diffs() {
+  local repo_base="$1"
+  local local_base="$2"
+  shift 2
+
+  local use_git=false
+  command -v git >/dev/null 2>&1 && use_git=true
+
+  local repo_file
+  for repo_file in "$@"; do
+    local file_rel="${repo_file#"$repo_base"/}"
+    local local_file="$local_base/$file_rel"
+
+    # a missing local file is diffed against /dev/null, showing a full deletion
+    [ -f "$local_file" ] || local_file="/dev/null"
+
+    if [ "$use_git" = true ]; then
+      # --no-pager: each file is a separate git call, so git must not spawn
+      # its own pager; the caller decides how the combined output is displayed
+      git --no-pager diff --no-index --no-renames "$repo_file" "$local_file"
+    else
+      diff -u "$repo_file" "$local_file"
+    fi
+  done
+}
 
 dotfiles-diff() {
   # remove potential trailing slashes for safe string matching
@@ -49,19 +151,20 @@ dotfiles-diff() {
   if [ "$DIFF_PAGER" = "bat" ]; then
     if ! command -v bat >/dev/null 2>&1; then
       echo "Error: DIFF_PAGER is set to 'bat', but 'bat' is not installed."
-      return 1
+      return 2
     fi
   elif [ "$DIFF_PAGER" = "delta" ]; then
     if ! command -v delta >/dev/null 2>&1; then
       echo "Error: DIFF_PAGER is set to 'delta', but 'delta' is not installed."
-      return 1
+      return 2
     fi
   elif [ "$DIFF_PAGER" != "default" ]; then
     echo "Error: Unsupported DIFF_PAGER '$DIFF_PAGER'. Supported options are 'default', 'bat', and 'delta'."
-    return 1
+    return 2
   fi
 
   local status_only=false
+  local repo_only=false
   local paths=()
 
   # parse arguments to separate flags from file paths
@@ -70,10 +173,17 @@ dotfiles-diff() {
       -s|--status)
         status_only=true
         ;;
+      -r|--repo-only|--strict)
+        repo_only=true
+        ;;
+      -h|--help)
+        usage
+        return 0
+        ;;
       -*)
         echo "Error: unknown option '$arg'"
-        echo "Usage: dotfiles-diff [-s|--status] <path1> [path2] ..."
-        return 1
+        usage
+        return 2
         ;;
       *)
         paths+=("$arg")
@@ -84,8 +194,8 @@ dotfiles-diff() {
   # check if the user provided at least one path argument
   if [ "${#paths[@]}" -eq 0 ]; then
     echo "Error: you must provide at least one file or directory to compare."
-    echo "Usage: dotfiles-diff [-s|--status] <path1> [path2] ..."
-    return 1
+    usage
+    return 2
   fi
 
   # dynamically build global exclusion rules
@@ -98,10 +208,13 @@ dotfiles-diff() {
     global_git_excludes+=(":(exclude)${pattern}")
   done
 
+  # track whether any comparison produced differences, to build the exit code
+  local found_changes=false
+
   # loop over all parsed path arguments
   for input_path in "${paths[@]}"; do
     local abs_path
-    
+
     # remove trailing slash from input for consistent directory handling
     input_path="${input_path%/}"
 
@@ -116,17 +229,33 @@ dotfiles-diff() {
     local repo_path
     local rel_path
 
-    # determine if the provided path is in the repo or in the home directory
-    if [[ "$abs_path" == "$repo_dir"* ]]; then
-      rel_path="${abs_path#$repo_dir/}"
+    # determine if the provided path is in the repo or in the home directory.
+    # match either the directory itself or a path strictly inside it, so that
+    # sibling directories sharing a prefix (e.g. ~/repos/dotfiles-backup) are
+    # not mistaken for the repo.
+    if [ "$abs_path" = "$repo_dir" ] || [ "$abs_path" = "$home_dir" ]; then
+      # comparing the repo (or home) root itself: diff the whole repo tree
+      # against the home directory (most useful together with -s and -r)
+      rel_path="."
+      local_path="$home_dir"
+      repo_path="$repo_dir"
+    elif [[ "$abs_path" == "$repo_dir"/* ]]; then
+      rel_path="${abs_path#"$repo_dir"/}"
       local_path="$home_dir/$rel_path"
       repo_path="$abs_path"
-    elif [[ "$abs_path" == "$home_dir"* ]]; then
-      rel_path="${abs_path#$home_dir/}"
+    elif [[ "$abs_path" == "$home_dir"/* ]]; then
+      rel_path="${abs_path#"$home_dir"/}"
       local_path="$abs_path"
       repo_path="$repo_dir/$rel_path"
     else
       echo "Error: '$input_path' is not located within $home_dir or $repo_dir. Skipping."
+      continue
+    fi
+
+    # strict mode: if the path does not exist in the repo at all, it is by
+    # definition untracked, so there is nothing to compare against
+    if [ "$repo_only" = true ] && [ ! -e "$repo_path" ]; then
+      echo "Skipping '$rel_path': not present in the repository (strict mode)."
       continue
     fi
 
@@ -144,7 +273,7 @@ dotfiles-diff() {
 
     # check if the existing target is a directory or a file
     if [ -d "$local_path" ] || [ -d "$repo_path" ]; then
-      
+
       # --- DIRECTORY HANDLING ---
       # ONLY apply exclusions if we are comparing directories
       active_git_excludes=("${global_git_excludes[@]}")
@@ -153,13 +282,15 @@ dotfiles-diff() {
       if [ ! -d "$local_path" ]; then
         [ "$status_only" = false ] && echo "Warning: local directory is missing ($local_path)"
         temp_dir=$(mktemp -d)
+        TEMP_DIRS+=("$temp_dir")
         diff_local="$temp_dir"
       elif [ ! -d "$repo_path" ]; then
         [ "$status_only" = false ] && echo "Warning: repo directory is missing ($repo_path)"
         temp_dir=$(mktemp -d)
+        TEMP_DIRS+=("$temp_dir")
         diff_repo="$temp_dir"
       fi
-      
+
     else
       # --- FILE HANDLING ---
       if [ ! -f "$local_path" ]; then
@@ -175,13 +306,81 @@ dotfiles-diff() {
     echo "Target: $rel_path"
     echo "=============================================================================="
 
+    # --- STRICT DIRECTORY FAST PATH ---
+    # In strict mode the repo file list IS the whole comparison scope, so each
+    # repo file is checked directly against its local counterpart instead of
+    # recursively diffing both trees (the local side may be as large as the
+    # entire home directory, and walking it can take minutes).
+    if [ "$repo_only" = true ] && [ -d "$diff_repo" ]; then
+
+      # build the find(1) prune expression from the shared ignore patterns
+      local find_prune=()
+      for pattern in "${IGNORE_PATTERNS[@]}"; do
+        [ ${#find_prune[@]} -gt 0 ] && find_prune+=(-o)
+        find_prune+=(-name "$pattern")
+      done
+
+      # walk the repo side only, collecting the files whose local counterpart
+      # is missing or different; in status mode the result is printed directly
+      local changed_files=()
+      local repo_file
+      while IFS= read -r repo_file; do
+        local file_rel="${repo_file#"$diff_repo"/}"
+        local local_file="$diff_local/$file_rel"
+
+        # prefix the display path with the target's relative path, matching
+        # the output of the regular (non strict) directory comparison
+        local display_path="$file_rel"
+        [ "$rel_path" != "." ] && display_path="$rel_path/$file_rel"
+
+        if [ ! -e "$local_file" ]; then
+          [ "$status_only" = true ] && echo "  [-] Missing (Deleted locally): $display_path"
+          changed_files+=("$repo_file")
+        elif [ ! -f "$local_file" ]; then
+          [ "$status_only" = true ] && echo "  [T] Type Changed             : $display_path"
+          changed_files+=("$repo_file")
+        elif ! cmp -s "$repo_file" "$local_file"; then
+          [ "$status_only" = true ] && echo "  [~] Modified (Local differs) : $display_path"
+          changed_files+=("$repo_file")
+        fi
+      done < <(find "$diff_repo" \( "${find_prune[@]}" \) -prune -o -type f -print | sort)
+
+      if [ ${#changed_files[@]} -eq 0 ]; then
+        [ "$status_only" = true ] && echo "  (no differences)"
+      else
+        found_changes=true
+
+        # full diff mode: print one diff per changed file through the pager
+        if [ "$status_only" = false ]; then
+          if [ "$DIFF_PAGER" = "bat" ]; then
+            emit-strict-diffs "$diff_repo" "$diff_local" "${changed_files[@]}" | bat -l diff
+          elif [ "$DIFF_PAGER" = "delta" ]; then
+            emit-strict-diffs "$diff_repo" "$diff_local" "${changed_files[@]}" | delta
+          else
+            emit-strict-diffs "$diff_repo" "$diff_local" "${changed_files[@]}"
+          fi
+        fi
+      fi
+
+      # clean up and skip the generic (tree walking) comparison below
+      if [ -n "$temp_dir" ] && [ -d "$temp_dir" ]; then
+        rm -rf "$temp_dir"
+      fi
+      continue
+    fi
+
     # --- DYNAMIC COMMAND BUILDING ---
     # Repo (source of truth) is ALWAYS passed first, Local (subject) is passed second.
-    
-    local git_cmd=(git diff --no-index)
+
+    # disable rename detection: pairing a deleted repo file with an unrelated
+    # local file as a "rename" hides both the missing and the untracked entry
+    local git_cmd=(git diff --no-index --no-renames)
     [ "$status_only" = true ] && git_cmd+=(--name-status)
+    # strict mode: with the repo as left side, local-only files show up as
+    # "Added"; a lowercase letter in --diff-filter excludes that change type
+    [ "$repo_only" = true ] && git_cmd+=(--diff-filter=a)
     git_cmd+=("$diff_repo" "$diff_local")
-    
+
     # append exclusions only if the array is populated (i.e., it's a directory)
     if [ ${#active_git_excludes[@]} -gt 0 ]; then
       git_cmd+=(-- "${active_git_excludes[@]}")
@@ -190,24 +389,33 @@ dotfiles-diff() {
     local diff_cmd=(diff)
     if [ "$status_only" = true ]; then
       diff_cmd+=(-qr)
+    elif [ "$repo_only" = true ]; then
+      # strict mode: drop -N so local-only files are not expanded into full
+      # "new file" diffs; their leftover "Only in" lines are removed later
+      # by the strict-filter helper
+      diff_cmd+=(-ur)
     else
       diff_cmd+=(-urN)
     fi
     diff_cmd+=("${active_diff_excludes[@]}" "$diff_repo" "$diff_local")
 
     # --- EXECUTION & PARSING ---
+    # Both git diff and plain diff exit with 1 when differences are found,
+    # so we capture the first command's exit code of every pipeline.
+    local exit_code=0
+
     if [ "$status_only" = true ]; then
       # STATUS MODE
       if command -v git >/dev/null 2>&1; then
-        
+
         # execute dynamic git command
         "${git_cmd[@]}" | while read -r status target_file; do
-          
+
           # strip absolute prefixes to show clean relative paths
           local display_path="$target_file"
-          display_path="${display_path#$repo_dir/}"
-          display_path="${display_path#$home_dir/}"
-          if [ -n "$temp_dir" ]; then display_path="${display_path#$temp_dir/}"; fi
+          display_path="${display_path#"$repo_dir"/}"
+          display_path="${display_path#"$home_dir"/}"
+          if [ -n "$temp_dir" ]; then display_path="${display_path#"$temp_dir"/}"; fi
 
           # Translate git status codes based on Repo being the absolute source of truth
           case "$status" in
@@ -218,6 +426,7 @@ dotfiles-diff() {
             *)  echo "  [*] $status                  : $display_path" ;;
           esac
         done
+        exit_code=${PIPESTATUS[0]}
       else
         # fallback: use standard diff quiet/recursive output and parse it
         "${diff_cmd[@]}" | while read -r line; do
@@ -225,14 +434,16 @@ dotfiles-diff() {
             # extract directory and filename parts from "Only in /dir: filename"
             local dir_part=$(echo "$line" | awk -F': ' '{print $1}' | sed 's/^Only in //')
             local file_part=$(echo "$line" | awk -F': ' '{print $2}')
-            
+
             local display_path="$dir_part/$file_part"
-            display_path="${display_path#$repo_dir/}"
-            display_path="${display_path#$home_dir/}"
-            if [ -n "$temp_dir" ]; then display_path="${display_path#$temp_dir/}"; fi
+            display_path="${display_path#"$repo_dir"/}"
+            display_path="${display_path#"$home_dir"/}"
+            if [ -n "$temp_dir" ]; then display_path="${display_path#"$temp_dir"/}"; fi
 
             # Determine if the 'Only in' file is local (new/untracked) or repo (deleted locally)
             if [[ "$dir_part" == "$diff_local"* ]]; then
+               # strict mode: local-only files are untracked, so hide them
+               [ "$repo_only" = true ] && continue
                echo "  [+] Untracked (Local only)   : $display_path"
             else
                echo "  [-] Missing (Deleted locally): $display_path"
@@ -240,39 +451,58 @@ dotfiles-diff() {
           elif [[ "$line" == "Files "* ]]; then
             # extract the first file from "Files /dir1/file and /dir2/file differ"
             local file_part=$(echo "$line" | awk '{print $2}')
-            
+
             local display_path="$file_part"
-            display_path="${display_path#$repo_dir/}"
-            display_path="${display_path#$home_dir/}"
-            
+            display_path="${display_path#"$repo_dir"/}"
+            display_path="${display_path#"$home_dir"/}"
+
             echo "  [~] Modified (Local differs) : $display_path"
           fi
         done
+        exit_code=${PIPESTATUS[0]}
+      fi
+
+      # give explicit feedback instead of silence when everything matches
+      if [ "$exit_code" -eq 0 ]; then
+        echo "  (no differences)"
       fi
     else
       # FULL DIFF MODE
       if [ "$DIFF_PAGER" = "bat" ]; then
         if command -v git >/dev/null 2>&1; then
-          # Piping git diff implicitly disables its internal pager and color. 
+          # Piping git diff implicitly disables its internal pager and color.
           # We pass it to bat and explicitly tell it to parse as diff syntax.
           "${git_cmd[@]}" | bat -l diff
+          exit_code=${PIPESTATUS[0]}
         else
-          "${diff_cmd[@]}" | bat -l diff
+          "${diff_cmd[@]}" | strict-filter "$diff_local" "$repo_only" | bat -l diff
+          exit_code=${PIPESTATUS[0]}
         fi
       elif [ "$DIFF_PAGER" = "delta" ]; then
         if command -v git >/dev/null 2>&1; then
           "${git_cmd[@]}" | delta
+          exit_code=${PIPESTATUS[0]}
         else
-          "${diff_cmd[@]}" | delta
+          "${diff_cmd[@]}" | strict-filter "$diff_local" "$repo_only" | delta
+          exit_code=${PIPESTATUS[0]}
         fi
       else
         # Default fallback
         if command -v git >/dev/null 2>&1; then
           "${git_cmd[@]}"
+          exit_code=$?
         else
-          "${diff_cmd[@]}"
+          "${diff_cmd[@]}" | strict-filter "$diff_local" "$repo_only"
+          exit_code=${PIPESTATUS[0]}
         fi
       fi
+    fi
+
+    # exit code 1 means "differences found"; anything above 1 is a real error
+    if [ "$exit_code" -eq 1 ]; then
+      found_changes=true
+    elif [ "$exit_code" -gt 1 ]; then
+      echo "Error: the diff command failed for '$rel_path' (exit code $exit_code)."
     fi
 
     # clean up the temporary empty directory if one was created
@@ -281,6 +511,10 @@ dotfiles-diff() {
     fi
 
   done
+
+  # follow the diff convention: 1 if any differences were found, 0 otherwise
+  [ "$found_changes" = true ] && return 1
+  return 0
 }
 
 # execute the function passing all script arguments safely
