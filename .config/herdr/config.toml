@@ -1,0 +1,33 @@
+# general #
+###########
+
+onboarding = false
+
+
+[theme]
+name = "catppuccin"
+
+
+[terminal]
+shell_mode = "auto"
+new_cwd = "follow"
+
+
+[keys]
+prefix = "ctrl+b"
+
+
+[ui]
+agent_panel_sort = "priority"
+show_agent_labels_on_pane_borders = true
+prompt_new_tab_name = false
+hide_tab_bar_when_single_tab = true
+[ui.toast]
+delivery = "system"
+delay_seconds = 3
+[ui.sound.agents]
+claude = "on"
+
+
+[session]
+resume_agents_on_restore = true
