@@ -51,6 +51,7 @@ brew install fzf
 brew install git
 brew install git-delta
 brew install gnupg
+brew install herdr
 brew install htop
 brew install lazydocker
 brew install lazygit
