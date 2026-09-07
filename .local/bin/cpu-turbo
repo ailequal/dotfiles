@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+
+# show or change the Intel Turbo Boost state of the CPU (linux only)
+#
+# The kernel exposes a single switch, /sys/devices/system/cpu/intel_pstate/no_turbo:
+# writing 1 disables turbo, writing 0 re-enables it. Disabling turbo keeps every
+# core at (or below) its base frequency, which on a laptop means a much cooler
+# and quieter machine, at the cost of peak performance. Handy while compiling on
+# battery, on the couch, or during a video call with the fans right next to the mic.
+#
+# The change is IMMEDIATE and NOT PERSISTENT: it is a runtime kernel knob, so a
+# reboot (and, on most setups, a suspend/resume cycle) restores the default,
+# turbo-enabled state. Nothing is installed and no system file is edited.
+#
+# Changing the state needs root, so 'sudo' is used only for the actual write;
+# reading the status never asks for a password.
+#
+# Requirements: an Intel CPU driven by the 'intel_pstate' driver (the default on
+# any modern Intel laptop running Ubuntu). AMD CPUs and the older acpi-cpufreq
+# driver use a different knob and are not supported here.
+#
+# Exit codes:
+#   0 : success
+#   1 : unsupported system, or the change could not be applied
+#   2 : usage error (unknown command or option)
+#
+# Examples:
+#   cpu-turbo               --> report the current turbo state and CPU details
+#   cpu-turbo status        --> same as above, explicitly
+#   cpu-turbo off           --> disable turbo now (cooler and quieter laptop)
+#   cpu-turbo on            --> re-enable turbo now
+#   cpu-turbo toggle        --> flip whatever the current state is
+#   cpu-turbo -q            --> print just "on" or "off" (for scripts, statuslines)
+#   cpu-turbo -h            --> show the help message
+cpu-turbo() {
+  # the single kernel switch this whole script revolves around
+  local no_turbo="/sys/devices/system/cpu/intel_pstate/no_turbo"
+
+  local command=""
+  local quiet=false
+
+  # 1. parse the arguments: at most one command, plus its options
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      status|on|enable|off|disable|toggle)
+        if [ -n "$command" ]; then
+          echo "Error: only one command can be given at a time."
+          cpu-turbo-usage
+          return 2
+        fi
+        # normalize the aliases, so the rest of the script has a single spelling
+        case "$1" in
+          enable)  command="on" ;;
+          disable) command="off" ;;
+          *)       command="$1" ;;
+        esac
+        ;;
+      -q|--quiet)
+        quiet=true
+        ;;
+      -h|--help)
+        cpu-turbo-usage
+        return 0
+        ;;
+      *)
+        echo "Error: unknown argument '$1'."
+        cpu-turbo-usage
+        return 2
+        ;;
+    esac
+    shift
+  done
+
+  # with no command at all, just report the state
+  command="${command:-status}"
+
+  # 2. make sure this system can actually be driven by the script
+  if [ "$(uname -s)" != "Linux" ]; then
+    echo "Error: this script only works on linux (found '$(uname -s)')."
+    return 1
+  fi
+
+  if [ ! -f "$no_turbo" ]; then
+    echo "Error: '$no_turbo' not found, turbo cannot be controlled here."
+    echo "This script needs an Intel CPU driven by the 'intel_pstate' driver."
+    # a quick hint about what is actually running, to save a round of digging
+    local driver
+    driver=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver 2>/dev/null)
+    [ -n "$driver" ] && echo "Current cpufreq driver: $driver"
+    return 1
+  fi
+
+  # a laptop with turbo already disabled in the BIOS/firmware exposes the file
+  # as read-only, so there is nothing this script could ever write to it
+  local current
+  if ! current=$(cat "$no_turbo" 2>/dev/null); then
+    echo "Error: '$no_turbo' cannot be read."
+    return 1
+  fi
+
+  # 3. run the requested command
+  case "$command" in
+    status)
+      cpu-turbo-report "$current" "$quiet"
+      ;;
+    on)
+      cpu-turbo-set "$no_turbo" 0 "$current" "$quiet"
+      ;;
+    off)
+      cpu-turbo-set "$no_turbo" 1 "$current" "$quiet"
+      ;;
+    toggle)
+      # no_turbo 1 (turbo off) becomes 0 (turbo on), and the other way around
+      if [ "$current" = "1" ]; then
+        cpu-turbo-set "$no_turbo" 0 "$current" "$quiet"
+      else
+        cpu-turbo-set "$no_turbo" 1 "$current" "$quiet"
+      fi
+      ;;
+  esac
+}
+
+cpu-turbo-usage() {
+  echo "Usage: cpu-turbo [status|on|off|toggle] [-q|--quiet] [-h|--help]"
+  echo ""
+  echo "Commands:"
+  echo "  status        report the current turbo state (default when omitted)"
+  echo "  on, enable    re-enable turbo boost"
+  echo "  off, disable  disable turbo boost (cooler and quieter laptop)"
+  echo "  toggle        flip the current state"
+  echo ""
+  echo "Options:"
+  echo "  -q, --quiet   print only 'on' or 'off', with no extra output"
+  echo "  -h, --help    show this help message"
+  echo ""
+  echo "The change is immediate and lost on reboot, nothing is made permanent."
+}
+
+# Print the turbo state, plus a bit of context to make the effect visible.
+# Usage: cpu-turbo-report <no_turbo value> <quiet bool>
+cpu-turbo-report() {
+  local value="$1"
+  local quiet="$2"
+
+  # in quiet mode the state is the only thing printed, ready to be piped
+  local state="on"
+  [ "$value" = "1" ] && state="off"
+
+  if [ "$quiet" = true ]; then
+    echo "$state"
+    return 0
+  fi
+
+  local model
+  model=$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | sed 's/^ *//')
+
+  # 'status' tells whether intel_pstate runs in active or passive mode
+  local mode
+  mode=$(cat /sys/devices/system/cpu/intel_pstate/status 2>/dev/null)
+
+  # share of the total frequency range that lives above the base clock,
+  # i.e. how much performance turbo is actually worth on this CPU
+  local turbo_pct
+  turbo_pct=$(cat /sys/devices/system/cpu/intel_pstate/turbo_pct 2>/dev/null)
+
+  # highest clock any core is running at right now: the quickest way to see
+  # that a disabled turbo really pins the CPU to its base frequency
+  local clock
+  clock=$(cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2>/dev/null \
+    | awk 'BEGIN { max = 0 } $1 > max { max = $1 } END { if (max > 0) printf "%d MHz", max / 1000 }')
+
+  echo "turbo:  $state"
+  [ -n "$model" ]     && echo "cpu:    $model"
+  [ -n "$mode" ]      && echo "driver: intel_pstate ($mode)"
+  [ -n "$turbo_pct" ] && echo "range:  $turbo_pct% of the performance range is turbo"
+  [ -n "$clock" ]     && echo "clock:  $clock (fastest core right now)"
+}
+
+# Write the requested value to the kernel switch, then confirm what happened.
+# Usage: cpu-turbo-set <no_turbo path> <target value> <current value> <quiet bool>
+cpu-turbo-set() {
+  local no_turbo="$1"
+  local target="$2"
+  local current="$3"
+  local quiet="$4"
+
+  local state="on"
+  [ "$target" = "1" ] && state="off"
+
+  # nothing to do: skip the sudo prompt entirely when already in the right state
+  if [ "$current" = "$target" ]; then
+    if [ "$quiet" = true ]; then
+      echo "$state"
+    else
+      echo "Turbo is already $state, nothing to do."
+      echo ""
+      cpu-turbo-report "$current" false
+    fi
+    return 0
+  fi
+
+  # root writes directly; everyone else goes through sudo, which is the only
+  # step of the whole script that needs elevated privileges
+  if [ "$(id -u)" -eq 0 ]; then
+    echo "$target" > "$no_turbo" 2>/dev/null
+  else
+    if ! command -v sudo > /dev/null; then
+      echo "Error: 'sudo' is not installed, and changing turbo requires root."
+      return 1
+    fi
+    [ "$quiet" = true ] || echo "Turning turbo $state (this needs root)..."
+    echo "$target" | sudo tee "$no_turbo" > /dev/null
+  fi
+
+  # never trust the write: the kernel silently ignores it on locked firmware,
+  # so read the value back and report what the CPU is really doing
+  local applied
+  applied=$(cat "$no_turbo" 2>/dev/null)
+
+  if [ "$applied" != "$target" ]; then
+    echo "Error: turbo could not be turned $state."
+    echo "The kernel switch is still set to no_turbo=$applied, which usually means"
+    echo "turbo is locked by the firmware (check the BIOS/UEFI power settings)."
+    return 1
+  fi
+
+  if [ "$quiet" = true ]; then
+    echo "$state"
+    return 0
+  fi
+
+  echo "Turbo is now $state."
+  echo ""
+  cpu-turbo-report "$applied" false
+}
+
+cpu-turbo "$@"
