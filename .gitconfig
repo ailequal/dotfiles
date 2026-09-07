@@ -1,0 +1,53 @@
+[user]
+  name = Elia Pari
+  email = 37016865+ailequal@users.noreply.github.com
+  signingkey = 37016865+ailequal@users.noreply.github.com
+
+[core]
+  pager = delta
+  editor = vim
+  excludesfile = ~/.gitignore_global
+
+[init]
+  defaultBranch = main
+
+[push]
+  autoSetupRemote = true
+# [pull]
+#   rebase = true
+# [fetch]
+#   prune = true
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+
+[commit]
+  gpgsign = true
+
+[tag]
+  gpgSign = true
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true
+  dark = true
+
+[merge]
+  # conflictStyle = merge # least noisy output
+  conflictStyle = zdiff3 # improved diff3 output
+
+[alias]
+  # easy-to-read commit tree
+  lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %s %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+
+[include]
+  path = ~/.config/delta/themes/catppuccin.gitconfig
+
+[delta]
+  features = catppuccin-macchiato
+  # side-by-side = true
