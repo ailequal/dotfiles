@@ -68,8 +68,13 @@ sudo apt install neovim # latest stable version from the distribution
 # bob use stable
 
 # install jetbrains-mono (nerd font version)
+mkdir -p ~/.local/share/fonts/JetBrainsMonoNerd
+cd ~/.local/share/fonts/JetBrainsMonoNerd
+curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+tar -xf JetBrainsMono.tar.xz && rm JetBrainsMono.tar.xz
+fc-cache -f
 
-cargo binstall tree-sitter-cli
+cargo install tree-sitter-cli --locked
 
 # install lazygit
 
