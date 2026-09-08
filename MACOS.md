@@ -122,9 +122,11 @@ Optionally set a global shortcut for them with `skhd` following [this guide](htt
 
 These extra packages must be installed manually.
 
+- [deno](https://github.com/denoland/deno)
 - [lazyvim](./.config/lvim/README.md)
 - [nvm](https://github.com/nvm-sh/nvm)
 - [posting](https://github.com/darrenburns/posting)
+- [rust](https://github.com/rust-lang/rust)
 
 ### dotfiles
 

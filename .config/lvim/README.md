@@ -35,7 +35,7 @@ brew install --cask ghostty # with dedicated config file
 
 brew install neovim # latest stable version overall
 # or select which version with bob
-# cargo install bob-nvim
+# cargo install bob-nvim --locked
 # bob install stable
 # bob use stable
 
@@ -63,7 +63,7 @@ sudo apt install git
 
 sudo apt install neovim # latest stable version from the distribution
 # or select which version with bob
-# cargo install bob-nvim
+# cargo install bob-nvim --locked
 # bob install stable
 # bob use stable
 
