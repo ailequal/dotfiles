@@ -40,7 +40,7 @@ Launch the `bootstrap-macos` script, it will automatically install lots of usefu
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
 
 ```shell
-./local/bin/bootstrap-macos
+./.local/bin/bootstrap-macos
 ```
 
 ### settings setup

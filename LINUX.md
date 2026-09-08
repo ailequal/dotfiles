@@ -32,7 +32,7 @@ Launch the `bootstrap-linux` script, it will automatically install lots of usefu
 Otherwise, manually select which one you'd like to install (just delete or comment the unwanted lines).
 
 ```shell
-./local/bin/bootstrap-linux
+./.local/bin/bootstrap-linux
 ```
 
 ### settings setup
@@ -122,6 +122,7 @@ These extra packages must be installed manually.
 - [docker](https://docs.docker.com/engine/install/ubuntu)
 - [dua-cli](https://github.com/Byron/dua-cli)
 - [eza](https://github.com/eza-community/eza)
+- [fd](https://github.com/sharkdp/fd)
 - [go](https://github.com/golang/go)
 - [herdr](https://github.com/herdrdev/herdr)
 - [jetbrains-mono](https://github.com/JetBrains/JetBrainsMono) ([nerd font version](https://www.nerdfonts.com/font-downloads))
