@@ -4,113 +4,315 @@
 # git-backup #
 ##############
 
-# Inside the "repos.txt" file, set the repositories names, one per line.
-# The target folder is always generated in the current directory where the script is executed.
-# Inside the new folder, each repository will be stored inside a tar.gz archive.
-# Each repository is cloned as a mirror, so you can push it to a new remote.
-# To restore a repository, just untar the archive and git clone its mirror.
-# Example for executing the script with a few arguments:
-# ~/git-backup -u john.doe -r ~/repos.txt
+# Mirror-clone a list of git repositories and store each one as a tar.gz archive.
+#
+# Inside the repos file (default "repos.txt"), list one repository per line.
+# Blank lines and lines starting with '#' are ignored, so the list can be
+# commented and grouped freely.
+#
+#   my-app                  --> cloned as $username/my-app
+#   some-org/their-app      --> an explicit owner overrides -u for that line
+#
+# Every repository is cloned with --mirror, which copies all branches, tags and
+# refs. To restore one, untar the archive and clone the mirror it contains:
+#
+#   tar -xzf my-app.bak.tar.gz
+#   git clone my-app my-app-restored
+#
+# The target folder is created in the current working directory.
+#
+# Exit codes:
+#   0 : every repository was backed up
+#   1 : at least one repository failed (the others were still processed)
+#   2 : usage error, or nothing to do
+#
+# Examples:
+#   git-backup -u john.doe                        --> back up repos.txt to git-backup-<today>
+#   git-backup -u john.doe -r ~/repos.txt         --> read a specific list
+#   git-backup -u john.doe -t ~/backups/2026      --> pick the target folder
+#   git-backup -u john.doe -n                     --> dry run, show what would happen
+#   git-backup -u john.doe -y                     --> skip the confirmation prompt
+#   git-backup -u john.doe -k                     --> keep the mirrors, skip the archives
+#   git-backup -u john.doe -d git@gitlab.com      --> use another host
+#
+# Note on portability: macOS still ships bash 3.2, so this script deliberately
+# avoids anything newer (no mapfile, no associative arrays, no ${var,,}, and no
+# printf '%(...)T' which is a bash 4.2 builtin and silently yields nothing on a
+# Mac). 'set -e' is also deliberately not used: one unreachable repository must
+# not abort the whole backup, so every step is checked explicitly instead.
 
+usage() {
+  echo "Usage: git-backup -u <username> [-d <domain>] [-r <repos file>] [-t <target>] [-y] [-n] [-k] [-h]"
+  echo ""
+  echo "Options:"
+  echo "  -u <username>    account the repositories belong to (required)"
+  echo "  -d <domain>      git host to clone from (default: git@github.com)"
+  echo "  -r <repos file>  file listing one repository per line (default: repos.txt)"
+  echo "  -t <target>      folder to create for this backup (default: git-backup-<date>)"
+  echo "  -y               do not ask for confirmation"
+  echo "  -n               dry run: show what would be done, change nothing"
+  echo "  -k               keep the mirror folders instead of archiving them"
+  echo "  -h               show this help message"
+  echo ""
+  echo "Example:"
+  echo "  git-backup -u john.doe -r ~/repos.txt -t ~/backups/today"
+}
 
+# 1. defaults, then the flags that may override them
+domain="git@github.com"
+username=""
+repos="repos.txt"
+target=""
+assume_yes=false
+dry_run=false
+keep_mirror=false
+
+# the leading ':' turns on silent error reporting, so unknown flags and missing
+# values are handled by the two cases at the bottom instead of by getopts itself
+while getopts ":d:u:r:t:ynkh" flag; do
+  case "$flag" in
+    d) domain="$OPTARG" ;;
+    u) username="$OPTARG" ;;
+    r) repos="$OPTARG" ;;
+    t) target="$OPTARG" ;;
+    y) assume_yes=true ;;
+    n) dry_run=true ;;
+    k) keep_mirror=true ;;
+    h) usage; exit 0 ;;
+    \?) echo "Error: unknown option '-$OPTARG'." >&2; echo "" >&2; usage >&2; exit 2 ;;
+    :)  echo "Error: option '-$OPTARG' requires a value." >&2; exit 2 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -gt 0 ]; then
+  echo "Error: unexpected argument '$1' (every input is passed through a flag)." >&2
+  echo "" >&2
+  usage >&2
+  exit 2
+fi
+
+# 'date' is used instead of printf '%(...)T' so this also works on bash 3.2
+if [ -z "$target" ]; then
+  target="git-backup-$(date +%Y-%m-%d)"
+fi
+
+# 2. validate everything before touching the disk or the network
+if [ -z "$domain" ]; then
+  echo "Error: \$domain cannot be empty (-d)." >&2
+  exit 2
+fi
+
+if [ -z "$username" ]; then
+  echo "Error: \$username cannot be empty (-u)." >&2
+  echo "" >&2
+  usage >&2
+  exit 2
+fi
+
+if [ ! -f "$repos" ]; then
+  echo "Error: repos file not found: $repos (-r)." >&2
+  exit 2
+fi
+
+if [ ! -r "$repos" ]; then
+  echo "Error: repos file is not readable: $repos (-r)." >&2
+  exit 2
+fi
+
+if [ -e "$target" ]; then
+  echo "Error: target already exists, set a new one: $target (-t)." >&2
+  exit 2
+fi
+
+if ! command -v git > /dev/null; then
+  echo "Error: 'git' is not installed." >&2
+  exit 2
+fi
+
+# tar is only needed when the mirrors are actually archived
+if [ "$keep_mirror" = false ] && ! command -v tar > /dev/null; then
+  echo "Error: 'tar' is not installed (or pass -k to keep the mirrors as-is)." >&2
+  exit 2
+fi
+
+# 3. read the repository list, skipping blank lines and '# comments'
+# the '|| [ -n "$line" ]' keeps the last line even when the file has no final newline
+repo_list=()
+while IFS= read -r line || [ -n "$line" ]; do
+  line=$(echo "$line" | tr -d '[:space:]')
+  case "$line" in
+    ''|'#'*) continue ;;
+  esac
+  repo_list+=("$line")
+done < "$repos"
+
+total=${#repo_list[@]}
+if [ "$total" -eq 0 ]; then
+  echo "Error: no repositories listed in $repos." >&2
+  exit 2
+fi
 
 echo ""
 echo "# setup #"
 echo "#########"
 echo ""
-
-printf -v date '%(%Y-%m-%d)T\n' -1
-domain="git@github.com"
-username=""
-repos="repos.txt"
-target="git-backup-$date"
-count=1
-
-while getopts "d:u:r:t:" FLAG
-do
-  case "${FLAG}" in
-    d) domain="${OPTARG}" ;;
-    u) username="${OPTARG}" ;;
-    r) repos="${OPTARG}" ;;
-    t) target="${OPTARG}" ;;
-  esac
-done
-
-target=$(echo "$target" | tr -d '[:space:]')
-
-if [ -z "$domain" ]; then
-  echo "\$domain cannot be empty (-d)."
-  exit 0
-fi
-
-if [ -z "$username" ]; then
-  echo "\$username cannot be empty (-u)."
-  exit 0
-fi
-
-if [ -z "$repos" ]; then
-  echo "\$repos cannot be empty (-r)."
-  exit 0
-fi
-
-if [ ! -f "$repos" ]; then
-  echo "\$repos not found (-r)."
-  exit 0
-fi
-
-if [ -z "$target" ]; then
-  echo "\$target cannot be empty (-t)."
-  exit 0
-fi
-
-if [ -d "$target" ]; then
-  echo "\$target already exists, set a new one (-t)."
-  exit 0
-fi
-
 echo "Domain:   $domain"
 echo "Username: $username"
-echo "Repos:    $repos"
+echo "Repos:    $repos ($total found)"
 echo "Target:   $target"
+if [ "$keep_mirror" = true ]; then
+  echo "Mode:     keep mirrors (no archives)"
+fi
+if [ "$dry_run" = true ]; then
+  echo "Mode:     dry run (nothing will be written)"
+fi
 echo ""
 
-echo "Double check your configuration above."
-read -p "Do you want to continue? [y/n]" -n 1 -r
-echo ""
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+# 4. confirm, unless the run is unattended or harmless
+if [ "$dry_run" = false ] && [ "$assume_yes" = false ]; then
+  echo "Double check your configuration above."
+  read -r -p "Do you want to continue? [y/n] " -n 1 REPLY
   echo ""
-  echo "# processing #"
-  echo "##############"
-  echo ""
-
-  mkdir "$target"
-
-  while IFS= read -r repo; do
-    repo=$(echo "$repo" | tr -d '[:space:]')
-
-    if [ -n "$repo" ]; then
-      echo "$count: $repo"
-
-      ssh_repo="$domain:$username/$repo.git"
-      git clone --mirror "$ssh_repo" "./$target/$repo"
-      tar -zcvf "./$target/$repo.bak.tar.gz" -C "./$target" "$repo"
-      rm -rf "./$target/$repo"
-      count=$((count+1))
-
-      echo "##########"
-      echo ""
-    fi
-  done < "$repos"
-
-  echo "# end #"
-  echo "#######"
-  echo ""
-
-  exit 0
+  case "$REPLY" in
+    [Yy]) ;;
+    *) echo ""; echo "Script aborted."; exit 0 ;;
+  esac
 fi
 
 echo ""
-echo "Script aborted."
+echo "# processing #"
+echo "##############"
+echo ""
 
+# a partial mirror left behind by a Ctrl+C is worthless and potentially huge,
+# so remember the clone in flight and remove it if the script is interrupted
+current_clone=""
+on_interrupt() {
+  echo ""
+  echo "Interrupted."
+  if [ -n "$current_clone" ] && [ -d "$current_clone" ]; then
+    echo "Removing the incomplete clone: $current_clone"
+    rm -rf "$current_clone"
+  fi
+  exit 1
+}
+trap on_interrupt INT TERM
+
+if [ "$dry_run" = false ]; then
+  if ! mkdir -p "$target"; then
+    echo "Error: could not create the target folder: $target" >&2
+    exit 1
+  fi
+fi
+
+# 5. back up each repository, recording failures instead of aborting the run
+failed=()
+count=0
+
+for repo in "${repo_list[@]}"; do
+  count=$((count + 1))
+
+  # a line holding a '/' carries its own owner, otherwise -u provides it
+  case "$repo" in
+    */*) repo_path="$repo" ;;
+    *)   repo_path="$username/$repo" ;;
+  esac
+
+  # the folder and archive are named after the repository alone, so an
+  # "owner/repo" line still produces a plain "repo.bak.tar.gz"
+  repo_name="${repo_path##*/}"
+  ssh_repo="$domain:$repo_path.git"
+  clone_dir="$target/$repo_name"
+  archive="$target/$repo_name.bak.tar.gz"
+
+  echo "[$count/$total] $repo_path"
+
+  if [ "$dry_run" = true ]; then
+    echo "  would clone:   $ssh_repo"
+    if [ "$keep_mirror" = true ]; then
+      echo "  would keep:    $clone_dir"
+    else
+      echo "  would archive: $archive"
+    fi
+    echo ""
+    continue
+  fi
+
+  # never overwrite an archive: two owners can share a repository name
+  if [ -e "$archive" ] || [ -e "$clone_dir" ]; then
+    echo "  SKIPPED: '$repo_name' already exists in the target folder."
+    failed+=("$repo_path (name collision)")
+    echo ""
+    continue
+  fi
+
+  current_clone="$clone_dir"
+
+  if ! git clone --mirror "$ssh_repo" "$clone_dir"; then
+    echo "  FAILED: could not clone $ssh_repo"
+    # a failed clone can still leave a partial folder behind
+    rm -rf "$clone_dir"
+    current_clone=""
+    failed+=("$repo_path (clone failed)")
+    echo ""
+    continue
+  fi
+
+  if [ "$keep_mirror" = false ]; then
+    # -C keeps the archive free of the target folder's own path.
+    # 'v' is omitted on purpose: a mirror holds thousands of objects and
+    # listing them buries the progress of the backup itself
+    if ! tar -czf "$archive" -C "$target" "$repo_name"; then
+      echo "  FAILED: could not archive $repo_name"
+      rm -f "$archive"
+      rm -rf "$clone_dir"
+      current_clone=""
+      failed+=("$repo_path (archive failed)")
+      echo ""
+      continue
+    fi
+
+    if ! rm -rf "$clone_dir"; then
+      echo "  WARNING: archived, but the mirror folder could not be removed."
+    fi
+
+    echo "  OK: $archive"
+  else
+    echo "  OK: $clone_dir"
+  fi
+
+  current_clone=""
+  echo ""
+done
+
+trap - INT TERM
+
+# 6. report what actually happened, and say so in the exit code
+echo "# end #"
+echo "#######"
+echo ""
+
+if [ "$dry_run" = true ]; then
+  echo "Dry run complete: $total repositories would be processed."
+  exit 0
+fi
+
+failed_count=${#failed[@]}
+ok_count=$((total - failed_count))
+
+echo "Backed up: $ok_count/$total"
+
+if [ "$failed_count" -gt 0 ]; then
+  echo "Failed:    $failed_count"
+  echo ""
+  for entry in "${failed[@]}"; do
+    echo "  - $entry"
+  done
+  echo ""
+  echo "Target: $target"
+  exit 1
+fi
+
+echo "Target:    $target"
 exit 0
