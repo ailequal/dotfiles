@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# format markdown files with prettier
+# prettier is taken from the PATH when installed, otherwise the latest stable
+# release is run through npx (cached by npm after the first download)
+# config files are supported: prettier looks for a .prettierrc starting from the
+# folder of each file and walks up to the root, and skips the files matched by
+# .gitignore and .prettierignore in the current folder
+#   mdfmt README.md                   --> format one file in place
+#   mdfmt docs/*.md                   --> format several files in place
+#   mdfmt --stdin-filepath README.md  --> read stdin, print the result, never touch the file
+#                                         (the path only picks config and ignore rules)
+# inside vim/neovim: format the current buffer in place with
+#   :%!prettier --stdin-filepath %:S
+#   :%!mdfmt --stdin-filepath %:S
+mdfmt() {
+  if [ -z "$1" ]; then
+    echo "Error: you must provide at least one markdown file."
+    echo "Usage: mdfmt <file.md> [more files...]"
+    echo "       mdfmt --stdin-filepath <file.md> < input"
+    return 1
+  fi
+
+  # pick the prettier command: PATH binary first, npx fallback second
+  local prettier_cmd=()
+  if command -v prettier > /dev/null; then
+    prettier_cmd=(prettier)
+  elif command -v npx > /dev/null; then
+    prettier_cmd=(npx --yes prettier) # --yes: never ask before installing
+  else
+    echo "Error: neither 'prettier' nor 'npx' is installed. Install one first (e.g., npm install -g prettier, brew install prettier)."
+    return 1
+  fi
+
+  # stdin mode: filter for editors, formatted text goes to stdout and an ignored
+  # path is printed back unchanged, so the buffer is never lost
+  if [ "$1" = "--stdin-filepath" ]; then
+    if [ -z "$2" ]; then
+      echo "Error: '--stdin-filepath' requires a file path."
+      echo "Usage: mdfmt --stdin-filepath <file.md> < input"
+      return 1
+    fi
+    "${prettier_cmd[@]}" --stdin-filepath "$2"
+    return
+  fi
+
+  # file mode, --write: overwrite the files in place instead of printing to stdout
+  "${prettier_cmd[@]}" --write "$@"
+}
+
+mdfmt "$@"
