@@ -32,6 +32,7 @@ apt_packages=(
   make
   mpv
   net-tools
+  nmap
   openssl
   pngquant
   python3

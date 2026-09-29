@@ -67,6 +67,7 @@ brew_formulae=(
   mactop
   mpv
   neovim
+  nmap
   opencode
   openspec
   openssl

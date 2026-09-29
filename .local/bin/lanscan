@@ -1,0 +1,568 @@
+#!/usr/bin/env bash
+
+###########
+# lanscan #
+###########
+
+# Discover the devices that are reachable right now on a network and print
+# their IP, hostname, MAC address and vendor in a table.
+#
+# The scan itself is done by nmap. What this script adds is the choice of what
+# to scan:
+#
+#   - by default, the subnet of the default network interface, i.e. the local
+#     network the machine is connected to right now
+#   - with -t, the subnets advertised by a Tailscale subnet router: they are read
+#     from the local routing table, so a home LAN can be scanned from outside
+#     without knowing its address range
+#   - with -a, both of the above
+#   - explicit targets, when given, replace the detection entirely
+#
+# MAC addresses are read from the system neighbour (ARP) cache, which the scan
+# itself fills, and the vendor is looked up in the OUI list shipped with nmap.
+# Both are only possible for hosts on the same link: through Tailscale only IP
+# and hostname are available, hence the -p flag to help identify a device by
+# the services it exposes.
+#
+# Exit codes:
+#   0 : at least one host was found
+#   1 : the scan ran but no host answered
+#   2 : usage error, missing tool or nothing to scan
+#
+# Examples:
+#   lanscan                           --> the local subnet
+#   lanscan -t                        --> the subnets routed through Tailscale instead
+#   lanscan -a                        --> both
+#   lanscan 192.168.1.0/24            --> an explicit target (any nmap target spec works)
+#   lanscan 192.168.1.1-50 10.0.0.5   --> several explicit targets
+#   lanscan -i en1                    --> the local subnet of a specific interface
+#   lanscan -p 22,80,443,8080         --> also report which of these TCP ports are open
+#   lanscan -n                        --> skip reverse DNS, faster
+#   lanscan -s                        --> run nmap through sudo: ARP scan, MAC and vendor
+#                                         straight from nmap (meant for the local subnet,
+#                                         raw packets over the Tailscale tunnel may fail)
+#   lanscan -q                        --> only the IPs, one per line, for piping
+#   lanscan -w 30                     --> rescan every 30 seconds until Ctrl+C
+#   lanscan -d                        --> dry run: show what would be scanned and how
+#   lanscan -- -PE -PS22,443          --> pass extra options straight to nmap
+#
+# Requirements: nmap (brew install nmap / sudo apt install nmap).
+#
+# Note on portability: macOS still ships bash 3.2, so this script deliberately
+# avoids anything newer (no mapfile, no associative arrays, no ${var,,}).
+# 'set -e' is also deliberately not used: one failing subnet must not abort the
+# whole scan, so every step is checked explicitly instead.
+
+usage() {
+  echo "Usage: lanscan [-t | -a] [-i <interface>] [-p <ports>] [-n] [-s] [-q] [-w <seconds>] [-d] [-h] [<target>...] [-- <nmap options>]"
+  echo ""
+  echo "Targets:"
+  echo "  <target>         anything nmap accepts: 192.168.1.0/24, 192.168.1.1-50, 10.0.0.5, host.lan"
+  echo "                   when none is given the local subnet is scanned (the one of the"
+  echo "                   default interface), or the Tailscale subnets with -t, or both with -a"
+  echo ""
+  echo "Options:"
+  echo "  -t               scan the subnets routed through Tailscale (subnet routers) instead"
+  echo "  -a               scan both the local subnet and the Tailscale ones"
+  echo "  -i <interface>   interface for the local subnet (default: the default route one)"
+  echo "  -p <ports>       also check these TCP ports, comma separated, and list the open ones"
+  echo "  -n               do not resolve hostnames (faster)"
+  echo "  -s               run nmap with sudo: ARP scan with MAC and vendor from nmap itself"
+  echo "  -q               quiet: print only the IPs, one per line"
+  echo "  -w <seconds>     watch: rescan every <seconds> until Ctrl+C"
+  echo "  -d               dry run: print the targets and the nmap command, do not scan"
+  echo "  -h               show this help message"
+  echo ""
+  echo "Anything after '--' is passed to nmap as is (e.g. -- -PE -PS22,443 to change the probes)."
+  echo ""
+  echo "Examples:"
+  echo "  lanscan -p 22,80,443         # the local subnet with a few service checks"
+  echo "  lanscan -t                   # from outside: the home LAN through Tailscale"
+  echo "  lanscan -q | xargs -n1 -I{} ssh {} hostname"
+}
+
+# 1. defaults, then the flags that may override them
+mode="local" # local | tailscale | all
+interface=""
+ports=""
+resolve=true
+use_sudo=false
+quiet=false
+watch=""
+dry_run=false
+
+# the leading ':' turns on silent error reporting, so unknown flags and missing
+# values are handled by the two cases at the bottom instead of by getopts itself
+while getopts ":tai:p:nsqw:dh" flag; do
+  case "$flag" in
+    t) mode="tailscale" ;;
+    a) mode="all" ;;
+    i) interface="$OPTARG" ;;
+    p) ports="$OPTARG" ;;
+    n) resolve=false ;;
+    s) use_sudo=true ;;
+    q) quiet=true ;;
+    w) watch="$OPTARG" ;;
+    d) dry_run=true ;;
+    h) usage; exit 0 ;;
+    \?) echo "Error: unknown option '-$OPTARG'." >&2; echo "" >&2; usage >&2; exit 2 ;;
+    :)  echo "Error: option '-$OPTARG' requires a value." >&2; exit 2 ;;
+  esac
+done
+
+# getopts swallows a '--' that comes right after the flags: remember it, since
+# everything after it belongs to nmap and not to the target list
+raw_nmap=false
+if [ "$OPTIND" -gt 1 ]; then
+  previous=$((OPTIND - 1))
+  if [ "${!previous}" = "--" ]; then
+    raw_nmap=true
+  fi
+fi
+shift $((OPTIND - 1))
+
+# what is left are the explicit targets, and after an optional '--' the raw
+# nmap options
+targets=()
+nmap_extra=()
+while [ $# -gt 0 ]; do
+  if [ "$raw_nmap" = true ] || [ "$1" = "--" ]; then
+    if [ "$raw_nmap" = false ]; then
+      shift
+    fi
+    nmap_extra=("$@")
+    break
+  fi
+  case "$1" in
+    -*)
+      echo "Error: unexpected option '$1' after the targets: flags go before the targets, nmap options after '--'." >&2
+      exit 2 ;;
+  esac
+  targets+=("$1")
+  shift
+done
+
+# 2. validate the flags before touching the network
+if [ -n "$interface" ] && [ "$mode" = "tailscale" ]; then
+  echo "Error: -i only applies to the local subnet, which -t leaves out (use -a for both)." >&2
+  exit 2
+fi
+
+if [ -n "$ports" ] && ! echo "$ports" | grep -E -q '^[0-9]+(-[0-9]+)?(,[0-9]+(-[0-9]+)?)*$'; then
+  echo "Error: ports must be a comma separated list of numbers or ranges, e.g. 22,80,443 or 8000-8100 (-p)." >&2
+  exit 2
+fi
+
+if [ -n "$watch" ] && ! echo "$watch" | grep -E -q '^[1-9][0-9]*$'; then
+  echo "Error: the watch interval must be a positive number of seconds (-w)." >&2
+  exit 2
+fi
+
+if [ "$use_sudo" = true ] && ! command -v sudo > /dev/null; then
+  echo "Error: 'sudo' is not installed, needed by -s." >&2
+  exit 2
+fi
+
+# the only external dependency: everything else is part of the base system
+if ! command -v nmap > /dev/null; then
+  echo "Error: 'nmap' is not installed." >&2
+  if command -v brew > /dev/null; then
+    echo "Install it with: brew install nmap" >&2
+  elif command -v apt-get > /dev/null; then
+    echo "Install it with: sudo apt install nmap" >&2
+  else
+    echo "Install it with your package manager." >&2
+  fi
+  exit 2
+fi
+
+case "$(uname)" in
+  Darwin) os="macos" ;;
+  Linux) os="linux" ;;
+  *) echo "Error: unsupported platform '$(uname)' (macOS and Linux only)." >&2; exit 2 ;;
+esac
+
+if [ "$os" = "linux" ] && ! command -v ip > /dev/null; then
+  echo "Error: 'ip' is not installed (package iproute2), needed to detect the subnets." >&2
+  exit 2
+fi
+
+# 3. small IPv4 helpers, all on integers so they work on bash 3.2
+ip_to_int() {
+  local IFS=.
+  # shellcheck disable=SC2086 # word splitting on the dots is the point
+  set -- $1
+  echo $(( ($1 << 24) | ($2 << 16) | ($3 << 8) | $4 ))
+}
+
+int_to_ip() {
+  echo "$(( ($1 >> 24) & 255 )).$(( ($1 >> 16) & 255 )).$(( ($1 >> 8) & 255 )).$(( $1 & 255 ))"
+}
+
+# accepts 0xffffff00 (ifconfig on macOS) or 255.255.255.0
+mask_to_prefix() {
+  local value bits=0
+  case "$1" in
+    0x*) value=$(( $1 )) ;;
+    *) value=$(ip_to_int "$1") ;;
+  esac
+  while [ "$bits" -lt 32 ] && [ $(( value & 0x80000000 )) -ne 0 ]; do
+    bits=$(( bits + 1 ))
+    value=$(( (value << 1) & 0xffffffff ))
+  done
+  echo "$bits"
+}
+
+# 192.168.1.37 24 --> 192.168.1.0/24
+network_cidr() {
+  local mask
+  mask=$(( (0xffffffff << (32 - $2)) & 0xffffffff ))
+  echo "$(int_to_ip $(( $(ip_to_int "$1") & mask )))/$2"
+}
+
+# BSD netstat abbreviates classful networks: '192.168.1' is 192.168.1.0/24,
+# '10' is 10.0.0.0/8 and '172.16/12' keeps its explicit prefix
+expand_bsd_network() {
+  local address="${1%%/*}" prefix="" octets=1 dots
+  case "$1" in */*) prefix="${1#*/}" ;; esac
+  dots="${address//[^.]/}"
+  octets=$(( ${#dots} + 1 ))
+  while [ "$octets" -lt 4 ]; do
+    address="$address.0"
+    octets=$(( octets + 1 ))
+  done
+  if [ -z "$prefix" ]; then
+    prefix=$(( (${#dots} + 1) * 8 ))
+  fi
+  echo "$address/$prefix"
+}
+
+# 4. subnet detection
+default_interface() {
+  if [ "$os" = "macos" ]; then
+    route -n get default 2> /dev/null | awk '/interface:/ { print $2; exit }'
+  else
+    ip -4 route show default 2> /dev/null | awk '{ for (i = 1; i < NF; i++) if ($i == "dev") { print $(i + 1); exit } }'
+  fi
+}
+
+default_gateway() {
+  if [ "$os" = "macos" ]; then
+    route -n get default 2> /dev/null | awk '/gateway:/ { print $2; exit }'
+  else
+    ip -4 route show default 2> /dev/null | awk '{ for (i = 1; i < NF; i++) if ($i == "via") { print $(i + 1); exit } }'
+  fi
+}
+
+# prints "<ip> <prefix>" of the first IPv4 address of an interface
+interface_address() {
+  if [ "$os" = "macos" ]; then
+    ifconfig "$1" 2> /dev/null | awk '/inet / { print $2, $4; exit }' | while read -r ip mask; do
+      echo "$ip $(mask_to_prefix "$mask")"
+    done
+  else
+    ip -4 -o addr show dev "$1" 2> /dev/null | awk '{ split($4, a, "/"); print a[1], a[2]; exit }'
+  fi
+}
+
+# the Tailscale interface is the tunnel that owns an address in 100.64.0.0/10
+tailscale_interface() {
+  if [ "$os" = "macos" ]; then
+    ifconfig 2> /dev/null | awk '
+      /^utun[0-9]+:/ { iface = $1; sub(":", "", iface) }
+      /^\t*inet 100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\./ && iface != "" { print iface; exit }
+    '
+  else
+    ip -4 -o addr show 2> /dev/null | awk '$4 ~ /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\./ { print $2; exit }'
+  fi
+}
+
+# the subnets reachable through the Tailscale interface, one per line: what the
+# subnet routers advertise and this machine accepted. Host routes (the peers
+# themselves), the Tailscale range and the default route are left out.
+tailscale_subnets() {
+  local iface
+  iface=$(tailscale_interface)
+  if [ -z "$iface" ]; then
+    return
+  fi
+  if [ "$os" = "macos" ]; then
+    # columns: Destination Gateway Flags Netif Expire; 'H' flags a host route
+    netstat -rn -f inet 2> /dev/null | awk -v iface="$iface" '
+      $4 == iface && $1 != "default" && $3 !~ /H/ && $1 ~ /^[0-9]/ && $1 !~ /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])(\.|\/|$)/ { print $1 }
+    ' | while read -r network; do
+      expand_bsd_network "$network"
+    done
+  else
+    # Tailscale keeps its routes in its own table (52 by default), so every
+    # table is read; 'table all' also lists the local and broadcast entries,
+    # which the prefix regex leaves out (spelled out in full: mawk, the default
+    # awk on Ubuntu, mishandles {n} intervals)
+    ip -4 route show table all 2> /dev/null | awk -v iface="$iface" '
+      $1 ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/ && $1 !~ /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\./ {
+        for (i = 1; i < NF; i++) if ($i == "dev" && $(i + 1) == iface) { print $1; break }
+      }
+    '
+  fi
+}
+
+# refuse to auto-scan huge ranges: a /8 is 16 million addresses
+check_subnet_size() {
+  local prefix="${1#*/}"
+  if [ "$prefix" -lt 16 ]; then
+    echo "Warning: $1 is too big to scan automatically ($2), skipped: pass an explicit range instead." >&2
+    return 1
+  fi
+}
+
+# 5. build the target list
+local_interface=""
+local_ip=""
+gateway_ip=""
+
+if [ ${#targets[@]} -gt 0 ]; then
+  mode="explicit"
+else
+  if [ "$mode" = "tailscale" ] || [ "$mode" = "all" ]; then
+    ts_subnets=$(tailscale_subnets)
+    if [ -z "$ts_subnets" ]; then
+      message="no subnet is routed through Tailscale (is it running, are subnet routes accepted?)"
+      if [ "$mode" = "tailscale" ]; then
+        echo "Error: $message." >&2
+        exit 2
+      fi
+      # with -a the local subnet is still worth scanning
+      echo "Warning: $message, only the local subnet is scanned." >&2
+    fi
+    while read -r subnet; do
+      [ -z "$subnet" ] && continue
+      check_subnet_size "$subnet" "Tailscale route" || continue
+      targets+=("$subnet")
+    done <<< "$ts_subnets"
+  fi
+
+  if [ "$mode" = "local" ] || [ "$mode" = "all" ]; then
+    local_interface="${interface:-$(default_interface)}"
+    if [ -z "$local_interface" ]; then
+      echo "Error: no default route, pass an interface (-i) or an explicit target." >&2
+      exit 2
+    fi
+    address=$(interface_address "$local_interface")
+    if [ -z "$address" ]; then
+      echo "Error: no IPv4 address on interface '$local_interface'." >&2
+      exit 2
+    fi
+    local_ip="${address%% *}"
+    subnet=$(network_cidr "$local_ip" "${address##* }")
+    if check_subnet_size "$subnet" "interface $local_interface"; then
+      targets+=("$subnet")
+    fi
+  fi
+fi
+
+# the same subnet may be both local and routed through Tailscale when at home
+targets_unique=()
+while read -r target; do
+  [ -n "$target" ] && targets_unique+=("$target")
+done <<< "$(printf '%s\n' "${targets[@]}" | awk '!seen[$0]++')"
+targets=("${targets_unique[@]}")
+
+if [ ${#targets[@]} -eq 0 ]; then
+  echo "Error: nothing to scan (mode: $mode)." >&2
+  exit 2
+fi
+
+# these two only make sense when the local subnet is among the targets, but
+# marking them costs nothing when they simply never show up
+if [ -z "$local_ip" ]; then
+  address=$(interface_address "$(default_interface)")
+  local_ip="${address%% *}"
+fi
+gateway_ip=$(default_gateway)
+
+# 6. the nmap command
+nmap_cmd=()
+if [ "$use_sudo" = true ]; then
+  # ask for the password now, on the terminal, rather than from inside the
+  # scan where nmap output is captured
+  if [ "$dry_run" = false ] && ! sudo -v; then
+    echo "Error: sudo authentication failed (-s)." >&2
+    exit 2
+  fi
+  nmap_cmd+=(sudo)
+fi
+nmap_cmd+=(nmap -T4)
+if [ -n "$ports" ]; then
+  nmap_cmd+=(-p "$ports") # host discovery plus a connect scan of these ports
+else
+  nmap_cmd+=(-sn) # host discovery only
+fi
+if [ "$resolve" = false ]; then
+  nmap_cmd+=(-n)
+fi
+if [ ${#nmap_extra[@]} -gt 0 ]; then
+  nmap_cmd+=("${nmap_extra[@]}")
+fi
+nmap_cmd+=("${targets[@]}")
+
+if [ "$dry_run" = true ]; then
+  echo "Mode:      $mode"
+  if [ -n "$local_interface" ]; then
+    echo "Interface: $local_interface ($local_ip)"
+  fi
+  echo "Targets:   ${targets[*]}"
+  echo "Command:   ${nmap_cmd[*]}"
+  exit 0
+fi
+
+# the OUI list shipped with nmap, used to name the vendor of a MAC address
+oui_file=""
+for candidate in \
+  "${NMAPDIR:-/nonexistent}/nmap-mac-prefixes" \
+  "$(dirname "$(dirname "$(command -v nmap)")")/share/nmap/nmap-mac-prefixes" \
+  /usr/share/nmap/nmap-mac-prefixes \
+  /usr/local/share/nmap/nmap-mac-prefixes \
+  /opt/homebrew/share/nmap/nmap-mac-prefixes; do
+  if [ -r "$candidate" ]; then
+    oui_file="$candidate"
+    break
+  fi
+done
+
+# the neighbour cache as "<ip> <MAC>" lines, MAC upper case with zero padded
+# octets (macOS prints a0:1e:b:14:7b:b6), incomplete entries left out
+neighbours() {
+  if [ "$os" = "macos" ]; then
+    arp -an 2> /dev/null | awk '$4 ~ /^[0-9a-fA-F]+:[0-9a-fA-F]+:[0-9a-fA-F]+:[0-9a-fA-F]+:[0-9a-fA-F]+:[0-9a-fA-F]+$/ { ip = $2; gsub(/[()]/, "", ip); print ip, $4 }'
+  else
+    ip -4 neigh show 2> /dev/null | awk '{ for (i = 1; i < NF; i++) if ($i == "lladdr") { print $1, $(i + 1); break } }'
+  fi | awk '{
+    n = split($2, o, ":")
+    mac = ""
+    for (i = 1; i <= n; i++) mac = mac (i > 1 ? ":" : "") (length(o[i]) == 1 ? "0" : "") toupper(o[i])
+    print $1, mac
+  }'
+}
+
+# 7. one scan: run nmap, merge the neighbour cache and the OUI list, print
+tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/lanscan.XXXXXX") || exit 2
+trap 'rm -rf "$tmp_dir"' EXIT
+trap 'exit 130' INT TERM
+
+scan() {
+  local nmap_out="$tmp_dir/nmap.txt" hosts="$tmp_dir/hosts.tsv" neigh="$tmp_dir/neigh.txt"
+  local found summary
+
+  "${nmap_cmd[@]}" > "$nmap_out" 2> "$tmp_dir/nmap.err"
+  if [ ! -s "$nmap_out" ] || ! grep -q '^Nmap done' "$nmap_out"; then
+    echo "Error: nmap failed." >&2
+    sed 's/^/  /' "$tmp_dir/nmap.err" >&2
+    return 2
+  fi
+
+  # normal nmap output --> "ip \t hostname \t mac \t vendor \t open ports"
+  # ("Nmap scan report for host (ip)" or "... for ip", then one line per port)
+  awk -F'\t' -v OFS='\t' '
+    function flush() { if (ip != "") print ip, host, mac, vendor, ports }
+    /^Nmap scan report for / {
+      flush()
+      n = split($0, w, " ")
+      host = ""; mac = ""; vendor = ""; ports = ""
+      ip = w[n]
+      if (ip ~ /^\(.*\)$/) { gsub(/[()]/, "", ip); host = w[5] }
+    }
+    /^MAC Address: / {
+      split($0, w, " ")
+      mac = w[3]
+      vendor = $0; sub(/^MAC Address: [^ ]+ /, "", vendor); gsub(/^\(|\)$/, "", vendor)
+      if (vendor == "Unknown") vendor = ""
+    }
+    /^[0-9]+\/tcp +open/ { split($0, w, " "); sub(/\/tcp/, "", w[1]); ports = ports (ports == "" ? "" : ",") w[1] }
+    END { flush() }
+  ' "$nmap_out" | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n > "$hosts"
+
+  summary=$(awk '/^Nmap done:/ { sub(/^Nmap done: /, ""); print }' "$nmap_out")
+  found=$(awk 'END { print NR }' "$hosts")
+
+  if [ "$quiet" = true ]; then
+    cut -f1 "$hosts"
+    [ "$found" -gt 0 ]
+    return
+  fi
+
+  if [ "$found" -eq 0 ]; then
+    echo "No host answered."
+    echo ""
+    echo "$summary"
+    return 1
+  fi
+
+  neighbours > "$neigh"
+
+  # files are read in order: neighbour cache, OUI list, then the hosts; each
+  # one is told apart by FILENAME because BSD awk has no ARGIND
+  awk -F'\t' \
+    -v neigh="$neigh" -v oui="${oui_file:-/dev/null}" \
+    -v self="$local_ip" -v gateway="$gateway_ip" -v with_ports="$ports" '
+    FILENAME == neigh { split($0, w, " "); cache[w[1]] = w[2]; next }
+    FILENAME == oui   { if ($0 !~ /^#/ && length($0) > 7) { split($0, w, " "); vendors[w[1]] = substr($0, 8) }; next }
+    {
+      ip = $1; host = $2; mac = $3; vendor = $4; open = $5; note = ""
+      if (mac == "" && ip in cache) mac = cache[ip]
+      if (vendor == "" && mac != "") { key = toupper(mac); gsub(/:/, "", key); key = substr(key, 1, 6); if (key in vendors) vendor = vendors[key] }
+      if (ip == self) note = "this host"
+      else if (ip == gateway) note = "gateway"
+      n++
+      row_ip[n] = ip; row_host[n] = host; row_mac[n] = mac; row_vendor[n] = vendor; row_open[n] = open; row_note[n] = note
+    }
+    function pad(s, w) { return sprintf("%-" w "s", s) }
+    function dash(s) { return s == "" ? "-" : s }
+    END {
+      if (n == 0) exit
+      w_ip = 2; w_host = 8; w_mac = 3; w_vendor = 6; w_open = 4
+      for (i = 1; i <= n; i++) {
+        if (length(row_ip[i]) > w_ip) w_ip = length(row_ip[i])
+        if (length(dash(row_host[i])) > w_host) w_host = length(dash(row_host[i]))
+        if (length(dash(row_mac[i])) > w_mac) w_mac = length(dash(row_mac[i]))
+        if (length(dash(row_vendor[i])) > w_vendor) w_vendor = length(dash(row_vendor[i]))
+        if (length(dash(row_open[i])) > w_open) w_open = length(dash(row_open[i]))
+        if (row_note[i] != "") has_note = 1
+      }
+      line = pad("IP", w_ip) "  " pad("HOSTNAME", w_host) "  " pad("MAC", w_mac) "  " pad("VENDOR", w_vendor)
+      if (with_ports != "") line = line "  " pad("OPEN", w_open)
+      if (has_note) line = line "  NOTE"
+      print line
+      for (i = 1; i <= n; i++) {
+        line = pad(row_ip[i], w_ip) "  " pad(dash(row_host[i]), w_host) "  " pad(dash(row_mac[i]), w_mac) "  " pad(dash(row_vendor[i]), w_vendor)
+        if (with_ports != "") line = line "  " pad(dash(row_open[i]), w_open)
+        if (has_note) line = line "  " row_note[i]
+        print line
+      }
+    }
+  ' "$neigh" "${oui_file:-/dev/null}" "$hosts"
+
+  echo ""
+  echo "$summary"
+  if [ -z "$oui_file" ] && [ "$found" -gt 0 ]; then
+    echo "(vendor lookup skipped: nmap-mac-prefixes not found)"
+  fi
+  [ "$found" -gt 0 ]
+}
+
+# 8. run once, or keep rescanning
+if [ -z "$watch" ]; then
+  if [ "$quiet" = false ]; then
+    echo "Scanning ${targets[*]} ($mode)"
+    echo ""
+  fi
+  scan
+  exit $?
+fi
+
+while true; do
+  clear
+  echo "lanscan: ${targets[*]} ($mode), every ${watch}s, $(date '+%Y-%m-%d %H:%M:%S'), Ctrl+C to stop"
+  echo ""
+  scan
+  sleep "$watch"
+done
