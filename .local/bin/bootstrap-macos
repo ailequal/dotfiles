@@ -74,6 +74,7 @@ brew_formulae=(
   pinentry-mac
   pngquant
   ripgrep
+  shellcheck
   # thefuck
   tig
   # tmate
