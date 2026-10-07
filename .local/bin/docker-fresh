@@ -1,0 +1,438 @@
+#!/usr/bin/env bash
+
+################
+# docker-fresh #
+################
+
+# Wipe a Docker instance back to a clean slate: every container, image,
+# network, build cache and volume goes away, then buildx is cleaned up too.
+#
+# Volumes deserve a word. Since Docker Engine 23, 'docker system prune
+# --volumes' and 'docker volume prune' only remove ANONYMOUS volumes. The named
+# ones, which is what docker compose creates for databases (<project>_postgres
+# and friends), survive together with their data, so a "fresh" stack boots the
+# old database again. This script therefore removes every volume one by one
+# with 'docker volume rm', which works on any Docker version, prints each name,
+# and lets -K spare the ones worth keeping.
+# See: https://docs.docker.com/reference/cli/docker/volume/prune/
+#
+# With -s the containers that are up right now are left alone, together with
+# everything they depend on: their images, their networks and their volumes.
+# Only what no running container needs is removed. The containers are kept
+# because only the stopped ones are removed; the images and networks are kept
+# because 'docker system prune' never touches what a container still uses; the
+# volumes are kept because the ones mounted by a running container are skipped
+# explicitly, so every leftover is listed by name.
+#
+# Works on macOS (Docker Desktop) and Linux (native Docker Engine).
+#
+# Exit codes:
+#   0 : everything was removed (or the dry run completed)
+#   1 : the run finished but something could not be removed
+#   2 : usage error, docker missing or daemon unreachable
+#
+# Examples:
+#   docker-fresh                      --> interactive full wipe, asks first
+#   docker-fresh -y                   --> same, without the confirmation
+#   docker-fresh -n                   --> dry run: show what would go, change nothing
+#   docker-fresh -s                   --> spare the running containers and what they
+#                                         use, clear everything else
+#   docker-fresh -k                   --> wipe everything except the volumes
+#   docker-fresh -K 'work_*' -K pg    --> wipe everything, spare the volumes matching
+#                                         these globs (quote them, repeat as needed)
+#   docker-fresh -b                   --> skip the buildx cleanup
+#   docker-fresh -y -r                --> also hand the freed space back to the host
+#
+# Requirements: docker (https://docs.docker.com/get-docker/).
+#
+# Note on portability: macOS still ships bash 3.2, so this script deliberately
+# avoids anything newer (no mapfile, no associative arrays, no ${var,,}).
+# 'set -e' is also deliberately not used: cleanup commands legitimately return
+# non-zero when there is nothing to remove, so every step is checked explicitly
+# instead.
+#
+# WARNING: this is destructive and there is no undo. Unless -s, -k or -K says
+# otherwise, the data inside named volumes (databases!) is deleted for good.
+
+usage() {
+  echo "Usage: docker-fresh [-y] [-n] [-s] [-k | -K <glob>...] [-b] [-r] [-h]"
+  echo ""
+  echo "Options:"
+  echo "  -y               do not ask for confirmation"
+  echo "  -n               dry run: show what would be removed, change nothing"
+  echo "  -s               spare the running containers (paused and restarting ones"
+  echo "                   too) and the images, networks and volumes they use;"
+  echo "                   only what no running container needs is removed"
+  echo "  -k               keep every volume (their data survives)"
+  echo "  -K <glob>        keep the volumes whose name matches <glob>; repeatable,"
+  echo "                   quote the pattern so the shell does not expand it"
+  echo "  -b               skip the buildx cleanup (cache, history, inactive builders)"
+  echo "  -r               reclaim: hand the freed space back to the host afterwards"
+  echo "                   (Docker Desktop only: runs fstrim inside the VM through a"
+  echo "                   tiny alpine container; a no-op on native Linux)"
+  echo "  -h               show this help message"
+  echo ""
+  echo "Examples:"
+  echo "  docker-fresh -n                 # preview"
+  echo "  docker-fresh -s                 # keep what is up, clear the rest"
+  echo "  docker-fresh -y -K 'myapp_*'    # unattended, spare the myapp volumes"
+}
+
+# 1. defaults, then the flags that may override them
+assume_yes=false
+dry_run=false
+spare_running=false
+keep_all_volumes=false
+keep_patterns=()
+skip_buildx=false
+reclaim=false
+
+# the leading ':' turns on silent error reporting, so unknown flags and missing
+# values are handled by the two cases at the bottom instead of by getopts itself
+while getopts ":ynskK:brh" flag; do
+  case "$flag" in
+    y) assume_yes=true ;;
+    n) dry_run=true ;;
+    s) spare_running=true ;;
+    k) keep_all_volumes=true ;;
+    K) keep_patterns+=("$OPTARG") ;;
+    b) skip_buildx=true ;;
+    r) reclaim=true ;;
+    h) usage; exit 0 ;;
+    \?) echo "Error: unknown option '-$OPTARG'." >&2; echo "" >&2; usage >&2; exit 2 ;;
+    :)  echo "Error: option '-$OPTARG' requires a value." >&2; exit 2 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -gt 0 ]; then
+  echo "Error: unexpected argument '$1' (every input is passed through a flag)." >&2
+  echo "" >&2
+  usage >&2
+  exit 2
+fi
+
+# 2. validate everything before touching docker
+for pattern in "${keep_patterns[@]}"; do
+  if [ -z "$pattern" ]; then
+    echo "Error: -K needs a non-empty glob." >&2
+    exit 2
+  fi
+done
+
+if [ "$keep_all_volumes" = true ] && [ ${#keep_patterns[@]} -gt 0 ]; then
+  echo "Error: -k already keeps every volume, so -K makes no sense with it." >&2
+  exit 2
+fi
+
+if ! command -v docker > /dev/null; then
+  echo "Error: 'docker' is not installed." >&2
+  if command -v brew > /dev/null; then
+    echo "Install it with: brew install --cask docker" >&2
+  else
+    echo "Install it from: https://docs.docker.com/get-docker/" >&2
+  fi
+  exit 2
+fi
+
+# on linux a socket the user may not read looks exactly like a stopped daemon,
+# so the error text is checked to give the right hint
+if ! daemon_error=$(docker info 2>&1 > /dev/null); then
+  echo "Error: cannot reach the Docker daemon. Is Docker running?" >&2
+  case "$daemon_error" in
+    *"permission denied"*)
+      echo "The socket is not readable by this user: add yourself to the 'docker' group, or run with sudo." >&2 ;;
+  esac
+  exit 2
+fi
+
+# 3. small helpers
+
+# run <command...>: print the command, then run it unless this is a dry run.
+# meant for plain commands only, pipelines and redirections stay inline
+run() {
+  if [ "$dry_run" = true ]; then
+    echo "  would run: $*"
+    return 0
+  fi
+  echo "  $ $*"
+  "$@"
+}
+
+# docker desktop sits in a VM (macOS, Windows), the native engine does not;
+# the daemon says which one it is, uname is only the fallback
+is_docker_desktop() {
+  case "$(docker info --format '{{.OperatingSystem}}' 2> /dev/null)" in
+    *"Docker Desktop"*) return 0 ;;
+  esac
+  [ "$(uname)" = "Darwin" ]
+}
+
+# volume_is_kept <name>: true when the name matches one of the -K globs.
+# 'case' does the glob matching natively, no eval needed
+volume_is_kept() {
+  local name="$1" pattern
+  for pattern in "${keep_patterns[@]}"; do
+    # shellcheck disable=SC2254 # unquoted on purpose: the pattern must act as a glob
+    case "$name" in
+      $pattern) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+# volume_in_use <name>: true when a running container mounts the volume.
+# $running_volumes holds one name per line, filled in step 4
+volume_in_use() {
+  [ -n "$running_volumes" ] && echo "$running_volumes" | grep -qxF "$1"
+}
+
+# count the non-empty lines on stdin, 0 when there are none
+count_lines() {
+  grep -c . || true
+}
+
+# 4. look at what is up. 'docker ps' without -a lists the containers that are
+# alive: running, paused or restarting. with -s those are spared, and so are the
+# volumes they mount: the names are read from the mounts of each container
+# (bind mounts have no name and are skipped by the template)
+running_ids=$(docker ps -q 2> /dev/null)
+running_count=$(echo "$running_ids" | count_lines)
+running_volumes=""
+if [ "$spare_running" = true ] && [ -n "$running_ids" ]; then
+  running_volumes=$(echo "$running_ids" | xargs docker inspect \
+    --format '{{range .Mounts}}{{if eq .Type "volume"}}{{.Name}}{{"\n"}}{{end}}{{end}}' 2> /dev/null \
+    | grep . | sort -u)
+fi
+
+# 5. show what is there, then confirm unless the run is unattended or harmless
+echo ""
+echo "# setup #"
+echo "#########"
+echo ""
+echo "Host:     $(uname -s)/$(uname -m)"
+echo "Docker:   $(docker version --format '{{.Server.Version}}' 2> /dev/null || echo 'unknown')"
+if [ "$spare_running" = true ]; then
+  echo "Running:  $running_count container(s) spared with their images, networks and volumes (-s)"
+fi
+if [ "$keep_all_volumes" = true ]; then
+  echo "Volumes:  keep all (-k)"
+elif [ ${#keep_patterns[@]} -gt 0 ]; then
+  echo "Volumes:  remove all except those matching: ${keep_patterns[*]} (-K)"
+elif [ "$spare_running" = true ]; then
+  echo "Volumes:  remove all except those mounted by a running container"
+else
+  echo "Volumes:  remove all, named ones included"
+fi
+if [ "$skip_buildx" = true ]; then
+  echo "Buildx:   skipped (-b)"
+fi
+if [ "$reclaim" = true ]; then
+  echo "Reclaim:  yes (-r)"
+fi
+if [ "$dry_run" = true ]; then
+  echo "Mode:     dry run (nothing will be removed)"
+fi
+echo ""
+docker system df
+echo ""
+
+if [ "$dry_run" = false ] && [ "$assume_yes" = false ]; then
+  if [ "$spare_running" = true ]; then
+    echo "This permanently removes every stopped container, every image, network, volume"
+    echo "and build cache that no running container uses"
+  else
+    echo "This permanently removes every container, image, unused network and build"
+    echo "cache from this Docker instance"
+  fi
+  if [ "$keep_all_volumes" = false ]; then
+    echo "AND the volumes listed above, which deletes the data inside them (databases!)"
+  fi
+  echo ""
+  read -r -p "Do you want to continue? [y/n] " -n 1 REPLY
+  echo ""
+  case "$REPLY" in
+    [Yy]) ;;
+    *) echo ""; echo "Script aborted."; exit 0 ;;
+  esac
+fi
+
+echo ""
+echo "# processing #"
+echo "##############"
+echo ""
+
+trap 'echo ""; echo "Interrupted."; exit 1' INT TERM
+
+failures=0
+
+# 6. containers: with -s only the ones that are not alive (created, exited,
+# dead, stuck in removing) go; otherwise everything is stopped gracefully first,
+# then force-removed. the ids are piped into xargs so that xargs, not the
+# shell, splits them, and the empty case is handled by hand because BSD xargs
+# has no -r
+echo "[1/5] containers"
+if [ "$spare_running" = true ]; then
+  ids=$(docker ps -aq --filter status=created --filter status=exited --filter status=dead --filter status=removing 2> /dev/null)
+  if [ "$running_count" -gt 0 ]; then
+    echo "  spared $running_count running container(s):"
+    docker ps --format '{{.Names}} ({{.Image}})' | sed 's/^/    /'
+  fi
+else
+  ids=$(docker ps -aq 2> /dev/null)
+fi
+if [ -z "$ids" ]; then
+  echo "  none to remove"
+else
+  count=$(echo "$ids" | count_lines)
+  if [ "$dry_run" = true ]; then
+    if [ "$spare_running" = true ]; then
+      echo "  would remove $count stopped container(s):"
+    else
+      echo "  would stop and remove $count container(s):"
+    fi
+    echo "$ids" | xargs docker inspect --format '{{.Name}} ({{.Config.Image}})' 2> /dev/null | sed 's#^/##; s/^/    /'
+  else
+    if [ "$spare_running" = false ]; then
+      echo "  stopping $count container(s)"
+      echo "$ids" | xargs docker stop > /dev/null 2>&1
+    fi
+    echo "  removing $count container(s)"
+    echo "$ids" | xargs docker rm -f > /dev/null 2>&1
+  fi
+fi
+echo ""
+
+# 7. images, networks, build cache and anonymous volumes in one go. prune never
+# removes what a container still uses, so with -s the running ones keep their
+# images and networks for free. the named volumes are untouched by --volumes on
+# Docker >= 23, step 8 takes care of them
+echo "[2/5] images, networks, build cache"
+if [ "$keep_all_volumes" = true ]; then
+  run docker system prune --all --force
+else
+  run docker system prune --all --volumes --force
+fi
+echo ""
+
+# 8. every remaining volume, one by one. without -s all containers are gone at
+# this point, so each volume is unused and 'docker volume rm' can take it; with
+# -s the ones mounted by a running container are skipped by name
+echo "[3/5] volumes"
+if [ "$keep_all_volumes" = true ]; then
+  echo "  kept, as asked (-k)"
+else
+  names=$(docker volume ls -q 2> /dev/null)
+  if [ -z "$names" ]; then
+    echo "  none found"
+  else
+    removed=0
+    kept=0
+    while IFS= read -r name; do
+      [ -n "$name" ] || continue
+      if volume_in_use "$name"; then
+        echo "  keep:    $name (mounted by a running container)"
+        kept=$((kept + 1))
+        continue
+      fi
+      if volume_is_kept "$name"; then
+        echo "  keep:    $name (matches -K)"
+        kept=$((kept + 1))
+        continue
+      fi
+      if [ "$dry_run" = true ]; then
+        echo "  would remove: $name"
+        continue
+      fi
+      if docker volume rm -f "$name" > /dev/null 2>&1; then
+        echo "  removed: $name"
+        removed=$((removed + 1))
+      else
+        echo "  FAILED:  $name (still in use?)"
+        failures=$((failures + 1))
+      fi
+    done <<< "$names"
+    if [ "$dry_run" = false ]; then
+      echo "  $removed removed, $kept kept, $failures failed"
+    fi
+  fi
+fi
+echo ""
+
+# 9. buildx: build cache, build records, and the builders that are not running.
+# 'history' only exists on recent buildx releases, hence the probe; removing the
+# default builder is a documented no-op, so '--all-inactive' is always safe
+echo "[4/5] buildx"
+if [ "$skip_buildx" = true ]; then
+  echo "  skipped, as asked (-b)"
+elif ! docker buildx version > /dev/null 2>&1; then
+  echo "  buildx plugin not available, skipped"
+else
+  run docker buildx prune --all --force
+  if docker buildx history --help > /dev/null 2>&1; then
+    run docker buildx history rm --all
+  else
+    echo "  (buildx 'history' subcommand not available, skipped)"
+  fi
+  run docker buildx rm --all-inactive --force
+fi
+echo ""
+
+# 10. reclaim: only meaningful behind a VM. --privileged and --pid=host let the
+# container enter the VM namespaces, then nsenter runs the VM's own fstrim
+echo "[5/5] reclaim"
+if [ "$reclaim" = false ]; then
+  echo "  not requested (-r)"
+elif is_docker_desktop; then
+  echo "  Docker Desktop: running fstrim inside the VM (pulls a small alpine image)"
+  run docker run --rm --privileged --pid=host alpine nsenter -t 1 -m -u -i -n fstrim -v /
+  echo "  the Docker Desktop disk image does not always shrink fully; if it does not,"
+  echo "  use Settings > Resources > Disk image, or Troubleshoot > Clean / Purge data"
+else
+  echo "  native Docker Engine: prune already returned the space, nothing to do"
+fi
+echo ""
+
+trap - INT TERM
+
+# 11. report what is left, and say so in the exit code. bridge, host and none
+# are built-in networks, only the custom ones count; with -s leftovers are
+# expected, so the volume warning only fires when nothing was meant to survive
+echo "# end #"
+echo "#######"
+echo ""
+
+if [ "$dry_run" = true ]; then
+  echo "Dry run complete: nothing was removed."
+  exit 0
+fi
+
+docker system df
+echo ""
+
+containers=$(docker ps -aq 2> /dev/null | count_lines)
+images=$(docker images -q 2> /dev/null | count_lines)
+volumes=$(docker volume ls -q 2> /dev/null | count_lines)
+networks=$(docker network ls -q --filter type=custom 2> /dev/null | count_lines)
+
+echo "Left: $containers containers, $images images, $volumes volumes, $networks custom networks"
+
+if [ "$volumes" -gt 0 ]; then
+  echo ""
+  echo "Remaining volumes:"
+  docker volume ls -q | sed 's/^/  - /'
+  if [ "$spare_running" = false ] && [ "$keep_all_volumes" = false ] && [ ${#keep_patterns[@]} -eq 0 ]; then
+    echo ""
+    echo "WARNING: volumes remain although none were meant to be kept."
+    failures=$((failures + 1))
+  fi
+fi
+
+if [ "$failures" -gt 0 ]; then
+  echo ""
+  echo "Finished with $failures problem(s), see above."
+  exit 1
+fi
+
+echo "Done."
+exit 0
