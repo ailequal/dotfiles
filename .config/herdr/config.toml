@@ -15,6 +15,10 @@ new_cwd = "follow"
 
 [keys]
 prefix = "ctrl+b"
+# previous_tab = ["prefix+p", "prefix+shift+h"] # vim-style previous tab, keeps the prefix+p default
+# next_tab = ["prefix+n", "prefix+shift+l"]     # vim-style next tab, keeps the prefix+n default
+# swap_pane_left = ""                            # unbind default prefix+shift+h, now used by previous_tab
+# swap_pane_right = ""                           # unbind default prefix+shift+l, now used by next_tab
 
 
 [ui]
