@@ -12,6 +12,11 @@
 alias python=python3
 alias pip=pip3
 
+# homebrew (macos only)
+alias brew-check='brew update && brew outdated' # fetch the latest formulae and list what brew-up would upgrade
+alias brew-clean='brew autoremove && brew cleanup --prune=all' # drop orphaned deps, old versions and the whole download cache
+alias brew-up='brew update && brew upgrade && brew-clean' # upgrade everything, then brew-clean
+
 # youtube
 alias yt-dl-music="yt-dlp -f bestaudio -x --audio-format m4a $1"
 alias yt-dl-video="yt-dlp -f bestvideo+bestaudio $1"
