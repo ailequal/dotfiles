@@ -61,6 +61,8 @@ brew_formulae=(
   go
   herdr
   htop
+  iperf3
+  just
   lazydocker
   lazygit
   lolcat
@@ -75,12 +77,14 @@ brew_formulae=(
   pngquant
   ripgrep
   shellcheck
+  # sqlite
   # thefuck
   tig
   # tmate
   tmux
   tokei
   tree
+  uv
   vim
   yt-dlp
   zellij

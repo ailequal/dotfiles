@@ -126,6 +126,7 @@ These extra packages must be installed manually.
 - [glow](https://github.com/charmbracelet/glow)
 - [go](https://github.com/golang/go)
 - [herdr](https://github.com/herdrdev/herdr)
+- [just](https://github.com/casey/just)
 - [jetbrains-mono](https://github.com/JetBrains/JetBrainsMono) ([nerd font version](https://www.nerdfonts.com/font-downloads))
 - [lazydocker](https://github.com/jesseduffield/lazydocker)
 - [lazygit](https://github.com/jesseduffield/lazygit)
@@ -135,6 +136,7 @@ These extra packages must be installed manually.
 - [opencode](https://github.com/anomalyco/opencode)
 - [posting](https://github.com/darrenburns/posting)
 - [rust](https://github.com/rust-lang/rust)
+- [uv](https://github.com/astral-sh/uv)
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [zellij](https://github.com/zellij-org/zellij)
 
