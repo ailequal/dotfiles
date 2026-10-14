@@ -123,6 +123,7 @@ These extra packages must be installed manually.
 - [dua-cli](https://github.com/Byron/dua-cli)
 - [eza](https://github.com/eza-community/eza)
 - [fd](https://github.com/sharkdp/fd)
+- [gh](https://github.com/cli/cli)
 - [glow](https://github.com/charmbracelet/glow)
 - [go](https://github.com/golang/go)
 - [herdr](https://github.com/herdrdev/herdr)

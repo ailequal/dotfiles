@@ -54,6 +54,7 @@ brew_formulae=(
   fd
   ffmpeg
   fzf
+  gh
   git
   git-delta
   glow
